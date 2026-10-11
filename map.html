@@ -4,6 +4,8 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0E8A72">
+<meta name="apple-mobile-web-app-title" content="問題集">
+<meta name="format-detection" content="telephone=no">
 <title>アジア 白地図クイズ</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -181,7 +183,7 @@ body.textmode .big { font-size: 2.6rem; }
       <label class="opt" for="intro">はじめに説明を聞く<span class="switch"><input type="checkbox" id="intro" checked><span></span></span></label>
       <label class="opt" for="bgm">BGM<span class="switch"><input type="checkbox" id="bgm" checked><span></span></span></label>
     </div>
-    <div class="warn" id="srWarn" hidden>このブラウザでは音声認識が使えません。AndroidのChromeで開いてください。いまは「画面のボタンで答え合わせ」するモードで動きます。</div>
+    <div class="warn" id="srWarn" hidden>このブラウザでは音声認識が使えません。AndroidはChrome、iPhoneはSafariで開いてください。いまは「画面のボタンで答え合わせ」するモードで動きます。</div>
     <button type="button" class="b main" id="startBtn" disabled>音声を準備しています…</button>
     <p class="note" id="startNote">はじめてのときは、マイクの使用を「許可」してください。静かな場所で使うと、よく聞き取れます。</p>
   </section>
@@ -286,6 +288,7 @@ var Q = JSON.parse(document.getElementById("qdata").textContent);
 var items = Q.items, N = items.length;
 var $ = function (id) { return document.getElementById(id); };
 var FAST = !!window.__QUIZ_FAST;
+var IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 var CIRC = "①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳㉑㉒㉓㉔";
 
 /* ---------- 正解の別名・よくある聞きまちがい ---------- */
@@ -457,7 +460,7 @@ function listenOnce(ms) {
     };
     rec.onend = function () { finish(passFlag ? { pass: true } : { alts: finals || (interim ? [interim] : []) }); };
     curRec = rec;
-    timer = setTimeout(function () { try { rec.stop(); } catch (e) {} }, ms);
+    timer = setTimeout(function () { try { rec.stop(); } catch (e) {} setTimeout(function () { finish({ alts: finals || (interim ? [interim] : []) }); }, 2500); }, ms);
     try { rec.start(); } catch (e) { finish({ error: "start" }); }
   });
 }
@@ -500,7 +503,7 @@ function setAnsMode(m) {
   ansMode = m;
   $("am-voice").setAttribute("aria-pressed", String(m === "voice")); $("am-text").setAttribute("aria-pressed", String(m === "text"));
   $("howVoice").hidden = m !== "voice"; $("howText").hidden = m !== "text";
-  $("startNote").textContent = m === "voice" ? "はじめてのときは、マイクの使用を「許可」してください。静かな場所で使うと、よく聞き取れます。"
+  $("startNote").textContent = m === "voice" ? (IOS ? "iPhoneは「設定＞一般＞キーボード＞音声入力」をオンにしてください。マイクの許可を聞かれたら「許可」を押します。" : "はじめてのときは、マイクの使用を「許可」してください。") + "静かな場所で使うと、よく聞き取れます。"
     : "電車ではイヤホンで。音を出せないときは「音を出す」をオフにすると、字幕だけで進められます。";
   $("srWarn").hidden = !(m === "voice" && !SRec);
   try { localStorage.setItem("asiaquiz.ans", m); } catch (e) {}
@@ -551,6 +554,7 @@ async function answer(kind, it) {
   for (var attempt = 0; attempt < 3; attempt++) {
     passFlag = false; showHeard("");
     setMic("on", "話してね"); bgmLevel("listen");
+    if (IOS) await wait(350);
     var r = await listenOnce(8000);
     setMic("off", "判定中…"); bgmLevel("normal");
     if (!alive(my)) return { aborted: true };
@@ -654,10 +658,11 @@ function requestWake() { if (navigator.wakeLock && navigator.wakeLock.request) n
 function releaseWake() { if (wake && wake.release) { wake.release().catch(function () {}); wake = null; } }
 
 async function begin(list, opts) {
+  try { if (navigator.audioSession) navigator.audioSession.type = ansMode === "voice" ? "play-and-record" : "playback"; } catch (e) {}
   await ctx.resume();
   document.body.classList.toggle("textmode", ansMode === "text");
   $("ansForm").hidden = ansMode !== "text"; clearSubs();
-  if (ansMode === "voice" && !manualOnly && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+  if (ansMode === "voice" && !manualOnly && !IOS && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
     try { var s = await navigator.mediaDevices.getUserMedia({ audio: true }); s.getTracks().forEach(function (t) { t.stop(); }); }
     catch (e) { manualOnly = true; $("srWarn").hidden = false; $("srWarn").textContent = "マイクが許可されていません。Chromeの設定でマイクを許可すると、声で答えられます。いまはボタンで答え合わせします。"; }
   }
