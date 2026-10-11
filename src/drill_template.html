@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#24658A">
+<title>アジアの首都 暗記ドリル</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Zen+Maru+Gothic:wght@500;700;900&display=swap">
+<style>
+/* Layout: one narrow drill sheet — settings, then a player card with subtitles; text mode keeps the input high so the phone keyboard never hides it */
+:root {
+  --bg: #EEF3F2; --surface: #FFFFFF; --ink: #1C2A2B; --muted: #5A6C6A; --line: #D3DEDB;
+  --sea: #24658A; --sea-soft: #DCEAF1; --ochre: #A86A12; --ochre-soft: #F6EAD5;
+  --ok: #D8432F; --ng: #2D5BD0; --on-accent: #FFFFFF;
+  --who-met: #B4447A; --who-zun: #3E8E3A;
+  --font-display: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "BIZ UDPGothic", sans-serif;
+  --font-body: "BIZ UDPGothic", "Hiragino Sans", "Noto Sans JP", "Yu Gothic", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111A1B; --surface: #1A2526; --ink: #E3ECEA; --muted: #9DB1AD; --line: #2E3D3E;
+    --sea: #73B6D8; --sea-soft: #1E3540; --ochre: #E5AE55; --ochre-soft: #3A2D18; --ok: #FF6F5E; --ng: #7EA0FF; --on-accent: #0E1A20;
+    --who-met: #F08DBA; --who-zun: #8FD08A; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111A1B; --surface: #1A2526; --ink: #E3ECEA; --muted: #9DB1AD; --line: #2E3D3E;
+  --sea: #73B6D8; --sea-soft: #1E3540; --ochre: #E5AE55; --ochre-soft: #3A2D18; --ok: #FF6F5E; --ng: #7EA0FF; --on-accent: #0E1A20;
+  --who-met: #F08DBA; --who-zun: #8FD08A; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.65;
+  padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.wrap { max-width: 34rem; margin: 0 auto; padding-inline: 14px; padding-block: .9rem 2.5rem; display: grid; gap: .9rem; }
+.top { display: flex; justify-content: space-between; align-items: center; gap: .5rem; }
+.top a { font-size: .82rem; color: var(--sea); text-decoration: none; font-weight: 700; }
+h1 { font-family: var(--font-display); font-weight: 900; font-size: 1.4rem; line-height: 1.3; margin: 0; text-wrap: balance; }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 1rem; display: grid; gap: .8rem; }
+.lbl { font-size: .78rem; font-weight: 700; color: var(--muted); letter-spacing: .04em; }
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: .45rem; }
+.seg button { font: inherit; text-align: left; cursor: pointer; border-radius: 12px; border: 2px solid var(--line); background: var(--surface); color: var(--ink); padding: .6rem .7rem; display: grid; gap: .05rem; min-width: 0; }
+.seg button b { font-family: var(--font-display); font-size: 1.02rem; }
+.seg button span { font-size: .74rem; color: var(--muted); }
+.seg button[aria-pressed="true"] { border-color: var(--sea); background: var(--sea-soft); }
+.opt { display: flex; justify-content: space-between; align-items: center; gap: .6rem; font-size: .92rem; }
+.switch { display: inline-flex; align-items: center; cursor: pointer; }
+.switch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.switch span { width: 2.6rem; height: 1.45rem; border-radius: 999px; background: var(--line); position: relative; transition: background .15s; }
+.switch span::after { content: ""; position: absolute; top: .2rem; left: .2rem; width: 1.05rem; height: 1.05rem; border-radius: 50%; background: #fff; transition: transform .15s; }
+.switch input:checked + span { background: var(--sea); }
+.switch input:checked + span::after { transform: translateX(1.15rem); }
+button.b { font: inherit; font-weight: 700; font-size: .95rem; padding: .7rem .6rem; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+button.main { background: var(--sea); color: var(--on-accent); border: 0; font-family: var(--font-display); font-size: 1.12rem; padding: .85rem; width: 100%; }
+button:disabled { opacity: .5; cursor: default; }
+button:focus-visible, input:focus-visible { outline: 3px solid var(--sea); outline-offset: 2px; }
+.switch input:focus-visible + span { outline: 3px solid var(--sea); outline-offset: 2px; }
+.note { font-size: .8rem; color: var(--muted); margin: 0; }
+.row { display: flex; gap: .5rem; } .row > * { flex: 1 1 0; min-width: 0; }
+
+/* player */
+.phead { display: flex; justify-content: space-between; align-items: center; gap: .5rem; }
+.count { font-family: var(--font-display); font-weight: 900; font-variant-numeric: tabular-nums; }
+.count small { font-weight: 500; color: var(--muted); }
+.chip { font: inherit; font-size: .75rem; font-weight: 700; padding: .15rem .6rem; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+.chip.on { background: var(--sea-soft); border-color: var(--sea); color: var(--sea); }
+.bar { height: 4px; background: var(--line); border-radius: 2px; overflow: hidden; }
+.bar span { display: block; height: 100%; width: 0; background: var(--sea); }
+.stage { display: grid; gap: .25rem; text-align: center; min-height: 6.6rem; align-content: center; }
+body.textmode .stage { min-height: 0; }
+body.textmode .big { font-size: 2.4rem; }
+body.textmode footer { display: none; }
+.q { font-family: var(--font-display); font-weight: 900; font-size: 1.75rem; line-height: 1.3; overflow-wrap: anywhere; }
+.arrow { color: var(--muted); font-size: .85rem; }
+.a { font-family: var(--font-display); font-weight: 900; font-size: 1.6rem; line-height: 1.3; color: var(--ochre); overflow-wrap: anywhere; min-height: 2.1rem; }
+.a.wait { color: var(--line); letter-spacing: .3em; }
+.timer { display: flex; justify-content: center; gap: .5rem; }
+.timer i { width: .75rem; height: .75rem; border-radius: 50%; border: 2px solid var(--sea); }
+.timer i.on { background: var(--sea); }
+.subs { background: var(--bg); border-radius: 12px; padding: .55rem .75rem; display: grid; gap: .15rem; min-height: 4.2rem; align-content: end; }
+.sub { margin: 0; font-size: .95rem; line-height: 1.5; overflow-wrap: anywhere; }
+.sub.prev { font-size: .8rem; color: var(--muted); }
+.sub .who { font-weight: 700; font-size: .72rem; margin-right: .4rem; padding: .05rem .4rem; border-radius: 6px; border: 1px solid currentColor; }
+.who.met { color: var(--who-met); } .who.zun { color: var(--who-zun); }
+.sub.prev .who { opacity: .7; }
+.ansform { display: flex; gap: .45rem; }
+.ansform input { flex: 1 1 auto; min-width: 0; font: inherit; font-size: 1.15rem; padding: .65rem .75rem; border-radius: 12px; border: 2px solid var(--line); background: var(--surface); color: var(--ink); }
+.ansform input:focus { border-color: var(--sea); outline: none; }
+.ansform button { flex: 0 0 auto; }
+.mark { text-align: center; min-height: 0; display: grid; gap: .1rem; }
+.big { font-family: var(--font-display); font-weight: 900; font-size: 3.4rem; line-height: 1; animation: pop .35s cubic-bezier(.2,1.6,.4,1); }
+.big.ok { color: var(--ok); } .big.ng { color: var(--ng); }
+.mark .you { font-size: .85rem; color: var(--muted); overflow-wrap: anywhere; }
+.mark .right { font-weight: 700; }
+@keyframes pop { from { transform: scale(.3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .big { animation: none; } }
+audio { width: 100%; }
+
+/* results */
+.score { text-align: center; background: var(--bg); border-radius: 12px; padding: .6rem; }
+.score b { font-family: var(--font-display); font-size: 2rem; font-variant-numeric: tabular-nums; }
+.tbl { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+th, td { text-align: left; padding: .35rem .25rem; border-top: 1px solid var(--line); vertical-align: top; }
+th { font-size: .72rem; color: var(--muted); }
+td.n { width: 1.8rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+td.mk button { font: inherit; font-weight: 900; border: 0; background: none; cursor: pointer; font-size: 1.05rem; padding: 0; }
+td.mk .o { color: var(--ok); } td.mk .x { color: var(--ng); }
+td small { display: block; color: var(--muted); font-size: .72rem; overflow-wrap: anywhere; }
+td.cap { color: var(--ochre); font-weight: 700; }
+footer { font-size: .72rem; color: var(--muted); display: grid; gap: .15rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><h1>アジアの首都 暗記ドリル</h1><a href="./" id="toMenu">問題集へ</a></div>
+
+  <section class="card" id="setCard">
+    <div class="lbl">出題の向き</div>
+    <div class="seg" role="group" aria-label="出題の向き">
+      <button type="button" id="d-c2k" aria-pressed="true"><b>国名 → 首都</b><span>例）タイ → バンコク</span></button>
+      <button type="button" id="d-k2c" aria-pressed="false"><b>首都 → 国名</b><span>例）バンコク → タイ</span></button>
+    </div>
+    <div class="lbl">答え方</div>
+    <div class="seg" role="group" aria-label="答え方">
+      <button type="button" id="m-recite" aria-pressed="true"><b>頭の中で答える</b><span>3秒後に答えが流れて自動で進む</span></button>
+      <button type="button" id="m-text" aria-pressed="false"><b>文字で答える</b><span>電車用。入力して○✕で採点</span></button>
+    </div>
+    <label class="opt" for="sound">音を出す（オフにすると字幕だけ）<span class="switch"><input type="checkbox" id="sound" checked><span></span></span></label>
+    <label class="opt" for="intro">はじめに説明を聞く<span class="switch"><input type="checkbox" id="intro" checked><span></span></span></label>
+    <button type="button" class="b main" id="startBtn" disabled>音声を準備しています…</button>
+    <p class="note" id="modeNote">スタートするたびに、24問の順番が入れかわります。</p>
+  </section>
+
+  <section class="card" id="playCard" hidden>
+    <div class="phead"><span class="count" id="count">説明</span><button type="button" class="chip on" id="soundChip" aria-pressed="true">音：あり</button></div>
+    <div class="bar" aria-hidden="true"><span id="bar"></span></div>
+    <div class="stage">
+      <div class="q" id="q"></div>
+      <div class="arrow" id="arrow" hidden>↓</div>
+      <div class="a wait" id="a" hidden>・・・</div>
+    </div>
+    <div class="timer" id="timer" aria-label="考える時間"><i></i><i></i><i></i></div>
+    <div class="mark" id="mark"></div>
+    <div class="subs" aria-live="polite" aria-label="字幕"><p class="sub prev" id="subPrev"></p><p class="sub" id="subCur"></p></div>
+    <form class="ansform" id="ansForm" hidden autocomplete="off">
+      <input id="ans" type="text" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" placeholder="答えを入力（ひらがなでもOK）" aria-label="答え">
+      <button type="submit" class="b main" style="width:auto;padding:.65rem 1rem;font-size:1rem">答える</button>
+    </form>
+    <audio id="audio" controls preload="auto" hidden></audio>
+    <div class="row" id="textBtns" hidden>
+      <button type="button" class="b" id="passBtn">わからない</button>
+      <button type="button" class="b" id="nextBtn">次へ</button>
+      <button type="button" class="b" id="stopBtn">やめる</button>
+    </div>
+    <div class="row" id="reciteBtns" hidden>
+      <button type="button" class="b" id="againBtn">新しい順番でやり直す</button>
+      <button type="button" class="b" id="stopBtn2">やめる</button>
+    </div>
+  </section>
+
+  <section class="card" id="resCard" hidden>
+    <div class="score">せいかい<br><b id="rs">0</b> / <span id="rn">24</span></div>
+    <p class="note">入力ミスなどで ✕ になったときは、○✕ をタップすると直せます。</p>
+    <div class="tbl"><table><thead><tr><th></th><th></th><th id="rh1">問題</th><th id="rh2">答え</th></tr></thead><tbody id="rt"></tbody></table></div>
+    <button type="button" class="b main" id="retryBtn">まちがえた問題だけもう一度</button>
+    <div class="row"><button type="button" class="b" id="newBtn">新しい順番でもう一度</button><button type="button" class="b" id="setBtn">設定にもどる</button></div>
+  </section>
+
+  <footer>
+    <div>出題範囲：配布されたExcelの24組</div>
+    <div>声：VOICEVOX:四国めたん（問題）／VOICEVOX:ずんだもん（答え）</div>
+  </footer>
+</div>
+
+<script type="application/json" id="ddata">__DATA__</script>
+<script>
+__TEXTJUDGE__
+(function () {
+"use strict";
+var DATA = JSON.parse(document.getElementById("ddata").textContent);
+var pairs = DATA.pairs, N = pairs.length, SUBS = DATA.subs;
+var $ = function (id) { return document.getElementById(id); };
+var FAST = !!window.__QUIZ_FAST;
+var CODE = { "アラブ首長国連邦": "ARE", "サウジアラビア": "SAU", "アフガニスタン": "AFG", "バングラデシュ": "BGD", "ネパール": "NPL",
+  "シンガポール": "SGP", "トルコ": "TUR", "マレーシア": "MYS", "韓国": "KOR", "北朝鮮": "PRK", "中国": "CHN", "モンゴル": "MNG",
+  "インドネシア": "IDN", "タイ": "THA", "フィリピン": "PHL", "クウェート": "KWT", "イラク": "IRQ", "イラン": "IRN", "カザフスタン": "KAZ",
+  "ベトナム": "VNM", "ミャンマー": "MMR", "パキスタン": "PAK", "インド": "IND", "イスラエル": "ISR" };
+pairs.forEach(function (p) { p.code = CODE[p.country]; });
+
+/* ---------- 設定 ---------- */
+var dir = "c2k", mode = "recite", soundOn = true;
+function store(k, v) { try { localStorage.setItem("drill." + k, v); } catch (e) {} }
+function load(k) { try { return localStorage.getItem("drill." + k); } catch (e) { return null; } }
+if (load("dir") === "k2c") dir = "k2c";
+if (load("mode") === "text") mode = "text";
+if (load("sound") === "0") soundOn = false;
+var h = (location.hash || "").replace("#", "");
+if (h === "text" || h === "recite") mode = h;
+function paint() {
+  $("d-c2k").setAttribute("aria-pressed", String(dir === "c2k")); $("d-k2c").setAttribute("aria-pressed", String(dir === "k2c"));
+  $("m-recite").setAttribute("aria-pressed", String(mode === "recite")); $("m-text").setAttribute("aria-pressed", String(mode === "text"));
+  $("sound").checked = soundOn;
+  $("modeNote").textContent = mode === "text"
+    ? "電車ではイヤホンで。音を出せないときは「音を出す」をオフにすると、字幕だけで進められます。"
+    : "スタートするたびに、24問の順番が入れかわります。画面を消しても音声は続きます。";
+}
+$("d-c2k").onclick = function () { dir = "c2k"; store("dir", dir); paint(); };
+$("d-k2c").onclick = function () { dir = "k2c"; store("dir", dir); paint(); };
+$("m-recite").onclick = function () { mode = "recite"; store("mode", mode); paint(); };
+$("m-text").onclick = function () { mode = "text"; store("mode", mode); paint(); };
+$("sound").onchange = function () { setSound(this.checked); };
+paint();
+
+/* ---------- 音声の部品 ---------- */
+var SR = 24000, OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext, octx;
+try { octx = new OAC(1, SR, SR); } catch (e) { SR = 44100; octx = new OAC(1, SR, SR); }
+var AC = window.AudioContext || window.webkitAudioContext, ctx = new AC(), master = ctx.createGain(), sfxG = ctx.createGain();
+master.connect(ctx.destination); sfxG.connect(master); sfxG.gain.value = .45;
+var pcm = {}, bufs = {};
+function b64(s) { var bin = atob(s), u = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u.buffer; }
+function decode(buf) { return new Promise(function (res, rej) { var done = false, ok = function (b) { if (!done) { done = true; res(b); } }, ng = function (e) { if (!done) { done = true; rej(e); } }; try { var p = octx.decodeAudioData(buf, ok, ng); if (p && p.then) p.then(ok, ng); } catch (e) { ng(e); } }); }
+function trim(b) {
+  var d = b.getChannelData(0), peak = 0, i; for (i = 0; i < d.length; i++) { var v = Math.abs(d[i]); if (v > peak) peak = v; }
+  var thr = peak * .01, s = 0, e = d.length - 1; while (s < d.length && Math.abs(d[s]) <= thr) s++; while (e > s && Math.abs(d[e]) <= thr) e--;
+  s = Math.max(0, s - Math.round(.02 * SR)); e = Math.min(d.length, e + Math.round(.04 * SR));
+  var out = d.slice(s, e), g = peak > 0 ? .89 / peak : 1; for (i = 0; i < out.length; i++) out[i] *= g; return out;
+}
+var keys = Object.keys(DATA.clips), loaded = 0;
+Promise.all(keys.map(function (k) {
+  return decode(b64(DATA.clips[k])).then(function (b) { pcm[k] = trim(b); loaded++; $("startBtn").textContent = "音声を準備しています… " + Math.round(loaded / keys.length * 100) + "%"; });
+})).then(function () { $("startBtn").disabled = false; $("startBtn").textContent = "スタート（新しい順番で）"; },
+         function () { $("startBtn").textContent = "音声を読み込めませんでした（開き直してください）"; });
+function buf(k) { if (!bufs[k]) { var a = pcm[k], b = ctx.createBuffer(1, a.length, SR); b.getChannelData(0).set(a); bufs[k] = b; } return bufs[k]; }
+
+/* ---------- 字幕 ---------- */
+function whoClass(w) { return w === "めたん" ? "met" : "zun"; }
+function setSub(who, text) {
+  var prev = $("subPrev"), cur = $("subCur");
+  prev.innerHTML = cur.innerHTML;
+  cur.innerHTML = "";
+  if (!text) return;
+  var w = document.createElement("span"); w.className = "who " + whoClass(who); w.textContent = who;
+  cur.appendChild(w); cur.appendChild(document.createTextNode(text));
+}
+function clearSubs() { $("subPrev").innerHTML = ""; $("subCur").innerHTML = ""; lastSubKey = null; }
+var lastSubKey = null;
+
+function setSound(on) {
+  soundOn = on; store("sound", on ? "1" : "0"); $("sound").checked = on;
+  master.gain.value = on ? 1 : 0; $("audio").muted = !on;
+  var c = $("soundChip"); c.textContent = on ? "音：あり" : "音：なし（字幕のみ）"; c.className = "chip" + (on ? " on" : ""); c.setAttribute("aria-pressed", String(on));
+}
+$("soundChip").onclick = function () { setSound(!soundOn); };
+setSound(soundOn);
+
+/* ---------- 効果音 ---------- */
+function tone(f, t, dur, type, vol) { var o = ctx.createOscillator(), g = ctx.createGain(); o.type = type; o.frequency.value = f; g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + .012); g.gain.exponentialRampToValueAtTime(.0001, t + dur); o.connect(g); g.connect(sfxG); o.start(t); o.stop(t + dur + .03); }
+var SFX = {
+  ok: function () { var t = ctx.currentTime; tone(1318.5, t, .32, "sine", .7); tone(1046.5, t + .2, .7, "sine", .7); },
+  ng: function () { var t = ctx.currentTime; tone(147, t, .2, "sawtooth", .3); tone(147, t + .27, .45, "sawtooth", .3); },
+  start: function () { var t = ctx.currentTime; [523, 659, 784, 1047].forEach(function (f, i) { tone(f, t + i * .09, .3, "triangle", .5); }); },
+  fanfare: function () { var t = ctx.currentTime; [[523,0],[523,.15],[523,.3],[659,.45],[784,.75],[1047,1.05]].forEach(function (n) { tone(n[0], t + n[1], n[0] === 1047 ? 1.1 : .22, "triangle", .5); }); }
+};
+
+/* ---------- 共通の状態 ---------- */
+var st = { token: 0, order: [], pos: 0, res: {}, list: [], accepting: false, runDir: "c2k" };
+var url = null, session = null, raf = 0, wake = null;
+function show(id) { ["setCard", "playCard", "resCard"].forEach(function (c) { $(c).hidden = c !== id; }); }
+function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function dots(n) { var is = $("timer").children; for (var k = 0; k < 3; k++) is[k].className = k < n ? "on" : ""; }
+function qKey(d, i) { return (d === "c2k" ? "cty" : "cap") + i + "_q"; }
+function aKey(d, i) { return (d === "c2k" ? "cap" : "cty") + i + "_a"; }
+function qName(d, i) { return d === "c2k" ? pairs[i].country : pairs[i].capital; }
+function aName(d, i) { return d === "c2k" ? pairs[i].capital : pairs[i].country; }
+function requestWake() { if (navigator.wakeLock && navigator.wakeLock.request) navigator.wakeLock.request("screen").then(function (w) { wake = w; }, function () {}); }
+function releaseWake() { if (wake && wake.release) { wake.release().catch(function () {}); wake = null; } }
+function stopAll() {
+  st.token++; st.accepting = false; stopVoice();
+  var au = $("audio"); au.pause(); cancelAnimationFrame(raf);
+  releaseWake();
+}
+
+/* ================= 頭の中で答える（暗唱）：毎回ちがう順番の音声を1本つくる ================= */
+function buildRecite(d) {
+  var order = shuffle(pairs.map(function (_, i) { return i; })), segs = [], len = 0, tl = [], subs = [];
+  var add = function (k) { subs.push({ t: len / SR, k: k }); segs.push(pcm[k]); len += pcm[k].length; };
+  var gap = function (s) { var z = new Float32Array(Math.round(s * SR)); segs.push(z); len += z.length; };
+  gap(.5);
+  if ($("intro").checked) { for (var i = 1; i <= 5; i++) { add("rc_" + d + "_" + i); gap(.45); } gap(1.1); }
+  order.forEach(function (i) {
+    var it = { i: i, qs: len / SR }; add(qKey(d, i)); it.qe = len / SR; gap(3); it.as = len / SR; add(aKey(d, i)); gap(2); it.end = len / SR; tl.push(it);
+  });
+  gap(.5); var os = len / SR; add("end_1"); gap(.45); add("end_2"); gap(.45); add("end_3"); gap(1);
+  var ab = new ArrayBuffer(44 + len * 2), v = new DataView(ab), ws = function (o, s) { for (var k = 0; k < s.length; k++) v.setUint8(o + k, s.charCodeAt(k)); };
+  ws(0, "RIFF"); v.setUint32(4, 36 + len * 2, true); ws(8, "WAVE"); ws(12, "fmt "); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, SR, true); v.setUint32(28, SR * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); ws(36, "data"); v.setUint32(40, len * 2, true);
+  var out = new Int16Array(ab, 44, len), o = 0;
+  segs.forEach(function (s) { for (var k = 0; k < s.length; k++) { var x = s[k]; x = x > 1 ? 1 : x < -1 ? -1 : x; out[o++] = x < 0 ? x * 32768 : x * 32767; } });
+  return { d: d, tl: tl, subs: subs, outro: os, total: len / SR, blob: new Blob([ab], { type: "audio/wav" }) };
+}
+function startRecite() {
+  document.body.classList.remove("textmode");
+  var s = buildRecite(dir); session = s;
+  if (url) URL.revokeObjectURL(url); url = URL.createObjectURL(s.blob);
+  var au = $("audio"); au.hidden = false; au.src = url; au.muted = !soundOn;
+  var p = au.play(); if (p && p.catch) p.catch(function () { setSub("めたん", "下の再生ボタン（▶）を押してください。"); });
+  $("textBtns").hidden = true; $("reciteBtns").hidden = false; $("ansForm").hidden = true; $("timer").hidden = false;
+  clearSubs(); $("mark").innerHTML = ""; updRecite(); requestWake();
+}
+function updRecite() {
+  var s = session; if (!s) return;
+  var t = $("audio").currentTime || 0, k = -1, j;
+  for (j = 0; j < s.subs.length; j++) { if (t + .02 >= s.subs[j].t) k = j; else break; }
+  if (k >= 0 && s.subs[k].k !== lastSubKey) { lastSubKey = s.subs[k].k; var sb = SUBS[lastSubKey]; setSub(sb.who, sb.text); }
+  $("bar").style.width = Math.min(100, t / s.total * 100) + "%";
+  var n = -1; for (j = 0; j < s.tl.length; j++) { if (t >= s.tl[j].qs - .05) n = j; else break; }
+  var qEl = $("q"), aEl = $("a");
+  if (n < 0 || t >= s.outro - .2) {
+    var end = t >= s.outro - .2;
+    $("count").innerHTML = end ? "おわり" : "説明"; qEl.textContent = end ? "おつかれさま！" : "説明を聞いてね";
+    aEl.hidden = $("arrow").hidden = true; dots(0); return;
+  }
+  var it = s.tl[n];
+  $("count").innerHTML = "第 " + (n + 1) + " 問 <small>/ " + N + "</small>";
+  qEl.textContent = qName(s.d, it.i); aEl.hidden = $("arrow").hidden = false;
+  if (t < it.as) { aEl.textContent = "・・・"; aEl.className = "a wait"; dots(t < it.qe ? 0 : Math.min(3, 4 - Math.ceil(it.as - t))); }
+  else { aEl.textContent = aName(s.d, it.i); aEl.className = "a"; dots(3); }
+}
+function loop() { updRecite(); raf = requestAnimationFrame(loop); }
+$("audio").addEventListener("play", function () { cancelAnimationFrame(raf); loop(); });
+$("audio").addEventListener("pause", function () { cancelAnimationFrame(raf); updRecite(); });
+$("audio").addEventListener("seeked", function () { lastSubKey = null; updRecite(); });
+$("audio").addEventListener("ended", function () { cancelAnimationFrame(raf); updRecite(); releaseWake(); });
+$("againBtn").onclick = function () { stopAll(); startRecite(); };
+
+/* ================= 文字で答える ================= */
+var curSrc = null, curRes = null;
+function play(k) {
+  var sb = SUBS[k]; if (sb) setSub(sb.who, sb.text);
+  return playRaw(k);
+}
+var skipFb = false;
+function playRaw(k) {
+  return new Promise(function (res) {
+    if (skipFb) { res(); return; }
+    if (FAST || !pcm[k]) { setTimeout(res, FAST ? 1 : 0); return; }
+    var s = ctx.createBufferSource(); s.buffer = buf(k); s.connect(master); curSrc = s; curRes = res;
+    s.onended = function () { if (curSrc === s) { curSrc = null; curRes = null; } res(); }; s.start();
+  });
+}
+function stopVoice() { if (curSrc) { var r = curRes; try { curSrc.onended = null; curSrc.stop(); } catch (e) {} curSrc = null; curRes = null; if (r) r(); } }
+function wait(ms) { return new Promise(function (r) { setTimeout(r, FAST ? 1 : ms); }); }
+var answerResolve = null, nextResolve = null;
+$("ansForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+  if (!st.accepting || !answerResolve) return;
+  var v = $("ans").value; if (!v.trim()) return;
+  var r = answerResolve; answerResolve = null; st.accepting = false; r({ text: v });
+});
+$("passBtn").onclick = function () {
+  if (st.accepting && answerResolve) { var r = answerResolve; answerResolve = null; st.accepting = false; r({ pass: true }); }
+  else if (nextResolve) { var n = nextResolve; nextResolve = null; skipFb = true; stopVoice(); n(); }
+};
+$("nextBtn").onclick = function () { if (nextResolve) { var n = nextResolve; nextResolve = null; skipFb = true; stopVoice(); n(); } };
+function waitAnswer() { return new Promise(function (r) { answerResolve = r; st.accepting = true; }); }
+function waitNext(ms) { return new Promise(function (r) { nextResolve = r; setTimeout(function () { if (nextResolve === r) { nextResolve = null; r(); } }, FAST ? 1 : ms); }); }
+
+function showMark(kind, you, right) {
+  var m = $("mark"); m.innerHTML = "";
+  if (!kind) return;
+  var s = document.createElement("div"); s.className = "big " + (kind === "correct" ? "ok" : "ng"); s.textContent = kind === "correct" ? "○" : "✕"; m.appendChild(s);
+  if (kind !== "correct") { var r = document.createElement("div"); r.className = "right"; r.textContent = (kind === "close" ? "おしい！ 正解：" : "正解：") + right; m.appendChild(r); }
+  if (you) { var y = document.createElement("div"); y.className = "you"; y.textContent = "あなたの答え：" + you; m.appendChild(y); }
+}
+async function runText(list, d, withIntro) {
+  document.body.classList.add("textmode");
+  var my = ++st.token, alive = function () { return my === st.token; };
+  st.list = list; st.runDir = d;
+  $("textBtns").hidden = false; $("reciteBtns").hidden = true; $("ansForm").hidden = false; $("audio").hidden = true; $("timer").hidden = true;
+  clearSubs(); $("mark").innerHTML = ""; $("a").hidden = $("arrow").hidden = true;
+  if (withIntro) {
+    $("count").textContent = "説明"; $("q").textContent = "説明を聞いてね";
+    for (var k of ["tx_" + d + "_1", "tx_2", "tx_3"]) { await play(k); if (!alive()) return; await wait(300); if (!alive()) return; }
+  }
+  for (var p = 0; p < list.length; p++) {
+    var i = list[p]; skipFb = false;
+    $("count").innerHTML = "第 " + (p + 1) + " 問 <small>/ " + list.length + "</small>";
+    $("bar").style.width = (p / list.length * 100) + "%";
+    $("q").textContent = qName(d, i); $("mark").innerHTML = "";
+    $("ans").value = ""; $("ans").disabled = false;
+    try { $("ans").focus({ preventScroll: true }); } catch (e) { $("ans").focus(); }
+    var ansP = waitAnswer();
+    play(qKey(d, i));
+    var r = await ansP; if (!alive()) return;
+    stopVoice();
+    var kind = d === "c2k" ? "k" : "c";
+    var j = r.pass ? { status: "pass" } : textJudge(kind, pairs[i].code, r.text);
+    var ok = j.status === "correct";
+    st.res[i] = { ok: ok, you: r.pass ? "わからない" : r.text, close: j.status === "close" };
+    showMark(ok ? "correct" : (j.status === "close" ? "close" : "wrong"), r.pass ? "わからない" : r.text, aName(d, i));
+    var nextP;
+    if (ok) {
+      SFX.ok(); await wait(550); if (!alive()) return;
+      var pk = "praise" + (1 + Math.floor(Math.random() * 3));
+      nextP = waitNext(60000);
+      await play(pk); if (!alive()) return;
+      setSub("ずんだもん", aName(d, i)); await playRaw(aKey(d, i)); if (!alive()) return;
+    } else {
+      SFX.ng(); await wait(700); if (!alive()) return;
+      var pre = j.status === "close" ? "close" : "ngpre";
+      nextP = waitNext(60000);
+      setSub("ずんだもん", SUBS[pre].text + aName(d, i)); await playRaw(pre); if (!alive()) return; await playRaw(aKey(d, i)); if (!alive()) return;
+    }
+    if (nextResolve) { var nr = nextResolve; nextResolve = null; nr(); }
+    await nextP; if (!alive()) return;
+    if (!skipFb) { await wait(ok ? 600 : 1300); if (!alive()) return; }
+  }
+  $("bar").style.width = "100%";
+  SFX.fanfare(); await play("end_tx"); if (!alive()) return;
+  showTextResults();
+}
+function showTextResults() {
+  document.body.classList.remove("textmode"); releaseWake(); show("resCard");
+  var d = st.runDir, tb = $("rt"); tb.innerHTML = "";
+  $("rh1").textContent = d === "c2k" ? "国名" : "首都"; $("rh2").textContent = d === "c2k" ? "首都（答え）" : "国名（答え）";
+  var score = 0;
+  st.list.forEach(function (i, n) {
+    var r = st.res[i], tr = document.createElement("tr");
+    tr.innerHTML = "<td class='n'>" + (n + 1) + "</td><td class='mk'></td><td></td><td class='cap'></td>";
+    var b = document.createElement("button"); b.type = "button"; b.className = r && r.ok ? "o" : "x"; b.textContent = r && r.ok ? "○" : "✕";
+    b.setAttribute("aria-label", (r && r.ok ? "正解" : "不正解") + "（タップで切りかえ）");
+    b.onclick = function () { if (r) { r.ok = !r.ok; showTextResults(); } };
+    tr.children[1].appendChild(b);
+    tr.children[2].textContent = qName(d, i);
+    tr.children[3].textContent = aName(d, i);
+    if (r && !r.ok) { var sm = document.createElement("small"); sm.textContent = "あなた：" + r.you; tr.children[3].appendChild(sm); }
+    if (r && r.ok) score++;
+    tb.appendChild(tr);
+  });
+  $("rs").textContent = score; $("rn").textContent = st.list.length;
+  var wrong = st.list.filter(function (i) { return !(st.res[i] && st.res[i].ok); });
+  $("retryBtn").disabled = !wrong.length;
+  $("retryBtn").textContent = wrong.length ? "まちがえた問題だけもう一度（" + wrong.length + "問）" : "まちがいなし！";
+}
+$("retryBtn").onclick = function () {
+  var wrong = st.list.filter(function (i) { return !(st.res[i] && st.res[i].ok); });
+  if (!wrong.length) return; show("playCard"); requestWake(); runText(shuffle(wrong.slice()), st.runDir, false);
+};
+$("newBtn").onclick = function () { begin(); };
+$("setBtn").onclick = function () { stopAll(); document.body.classList.remove("textmode"); show("setCard"); };
+
+/* ================= 開始・終了 ================= */
+async function begin() {
+  stopAll(); await ctx.resume();
+  show("playCard"); SFX.start();
+  if (mode === "recite") startRecite();
+  else { st.res = {}; requestWake(); runText(shuffle(pairs.map(function (_, i) { return i; })), dir, $("intro").checked); }
+}
+$("startBtn").onclick = begin;
+$("stopBtn").onclick = $("stopBtn2").onclick = function () { stopAll(); document.body.classList.remove("textmode"); show("setCard"); };
+window.__drillState = function () { return { res: st.res, list: st.list.slice(), dir: st.runDir, sub: $("subCur").textContent, prev: $("subPrev").textContent }; };
+})();
+</script>
+</body>
+</html>

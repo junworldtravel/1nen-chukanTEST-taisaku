@@ -1,0 +1,652 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#0E8A72">
+<title>アジア 白地図クイズ</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Zen+Maru+Gothic:wght@500;700;900&display=swap">
+<style>
+/* Layout: phone-first single column — map window on top (follows the current number), quiz card below, controls at the thumb */
+:root {
+  --bg: #EAF1F6;
+  --surface: #FFFFFF;
+  --ink: #172231;
+  --muted: #5B6878;
+  --line: #D3DDE6;
+  --accent: #0E8A72;      /* start / mic */
+  --accent-soft: #D7F0E9;
+  --ok: #E0402F;          /* ○ */
+  --ok-soft: #FCE3DF;
+  --ng: #2D5BD0;          /* ✕ */
+  --ng-soft: #DFE7FB;
+  --ring: #E0402F;
+  --on-accent: #FFFFFF;
+  --font-display: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "BIZ UDPGothic", sans-serif;
+  --font-body: "BIZ UDPGothic", "Hiragino Sans", "Noto Sans JP", "Yu Gothic", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0F171D; --surface: #18232B; --ink: #E4ECF2; --muted: #9AABB8; --line: #2C3A45;
+    --accent: #3FC2A3; --accent-soft: #163A33; --ok: #FF6F5E; --ok-soft: #3E211D; --ng: #7EA0FF; --ng-soft: #1E2944;
+    --ring: #FF6F5E; --on-accent: #0B1A16; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #0F171D; --surface: #18232B; --ink: #E4ECF2; --muted: #9AABB8; --line: #2C3A45;
+  --accent: #3FC2A3; --accent-soft: #163A33; --ok: #FF6F5E; --ok-soft: #3E211D; --ng: #7EA0FF; --ng-soft: #1E2944;
+  --ring: #FF6F5E; --on-accent: #0B1A16; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.6;
+  padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.wrap { max-width: 36rem; margin: 0 auto; padding-inline: 14px; padding-block: .8rem 2rem; display: grid; gap: .8rem; }
+h1 { font-family: var(--font-display); font-weight: 900; font-size: 1.3rem; line-height: 1.3; margin: 0; text-wrap: balance; }
+.top { display: flex; justify-content: space-between; align-items: center; gap: .5rem; flex-wrap: wrap; }
+.chips { display: flex; gap: .35rem; flex-wrap: wrap; }
+.chip { font-size: .8rem; font-weight: 700; padding: .15rem .6rem; border-radius: 999px; background: var(--surface); border: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.chip b { color: var(--ok); }
+
+/* map */
+.map { position: relative; width: 100%; aspect-ratio: var(--map-ar, 1.54); overflow: hidden; border-radius: 14px; border: 1px solid var(--line); background: #E4EEF4; touch-action: pan-y; }
+.mapin { position: absolute; inset: 0; transform-origin: 0 0; transition: transform .6s cubic-bezier(.3,.7,.2,1); will-change: transform; }
+.mapin img { width: 100%; height: 100%; display: block; user-select: none; -webkit-user-drag: none; }
+.ring { position: absolute; width: 4.4%; aspect-ratio: 1; border-radius: 50%; border: 3px solid var(--ring); translate: -50% -50%; box-shadow: 0 0 0 3px rgba(255,255,255,.75); animation: pulse 1.2s ease-in-out infinite; pointer-events: none; }
+@keyframes pulse { 0%,100% { scale: 1; } 50% { scale: 1.25; } }
+.mapbtns { position: absolute; right: 8px; bottom: 8px; display: flex; gap: 6px; }
+.mapbtns button { font: inherit; font-size: .78rem; font-weight: 700; padding: .25rem .65rem; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+.mapbtns button[aria-pressed="true"] { background: var(--ink); color: var(--surface); border-color: var(--ink); }
+
+/* cards */
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 1rem; display: grid; gap: .8rem; }
+.qhead { display: flex; justify-content: space-between; align-items: center; gap: .5rem; }
+.qno { font-family: var(--font-display); font-weight: 900; font-size: 1.15rem; font-variant-numeric: tabular-nums; }
+.qno small { font-size: .8rem; color: var(--muted); font-weight: 500; }
+.stage { font-size: .78rem; font-weight: 700; padding: .15rem .65rem; border-radius: 999px; background: var(--accent-soft); color: var(--accent); }
+.qtext { font-family: var(--font-display); font-weight: 900; font-size: 1.55rem; line-height: 1.35; text-align: center; min-height: 2.2em; display: grid; place-items: center; text-wrap: balance; }
+.mic { display: grid; justify-items: center; gap: .35rem; min-height: 6.2rem; align-content: center; }
+.micdot { width: 4.2rem; height: 4.2rem; border-radius: 50%; display: grid; place-items: center; background: var(--line); color: var(--muted); transition: background .2s; }
+.micdot svg { width: 1.9rem; height: 1.9rem; }
+.mic.on .micdot { background: var(--accent); color: var(--on-accent); animation: breathe 1.1s ease-in-out infinite; }
+@keyframes breathe { 0%,100% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 45%, transparent); } 50% { box-shadow: 0 0 0 14px color-mix(in srgb, var(--accent) 0%, transparent); } }
+.miclabel { font-size: .9rem; font-weight: 700; color: var(--muted); }
+.mic.on .miclabel { color: var(--accent); }
+.heard { font-size: .9rem; color: var(--muted); text-align: center; min-height: 1.5em; overflow-wrap: anywhere; }
+.heard b { color: var(--ink); }
+.mark { position: relative; text-align: center; min-height: 0; }
+.big { font-family: var(--font-display); font-weight: 900; font-size: 4.2rem; line-height: 1; display: inline-block; animation: pop .35s cubic-bezier(.2,1.6,.4,1); }
+.big.ok { color: var(--ok); } .big.ng { color: var(--ng); }
+.ans { font-weight: 700; margin-top: .2rem; }
+@keyframes pop { from { transform: scale(.3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .ring, .mic.on .micdot, .big { animation: none; } .mapin { transition: none; } }
+
+.row { display: flex; gap: .5rem; flex-wrap: wrap; }
+.row > * { flex: 1 1 0; min-width: 0; }
+button.b { font: inherit; font-weight: 700; font-size: .95rem; padding: .7rem .6rem; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+button.b:active { transform: translateY(1px); }
+button.main { background: var(--accent); color: var(--on-accent); border: 0; font-family: var(--font-display); font-size: 1.15rem; padding: .9rem; }
+button.okb { background: var(--ok); color: #fff; border: 0; font-size: 1.1rem; }
+button.ngb { background: var(--ng); color: #fff; border: 0; font-size: 1.1rem; }
+button:disabled { opacity: .5; cursor: default; }
+button:focus-visible, select:focus-visible, input:focus-visible + span { outline: 3px solid var(--accent); outline-offset: 2px; }
+.manual { border: 2px dashed var(--line); border-radius: 12px; padding: .8rem; display: grid; gap: .6rem; text-align: center; }
+.manual p { margin: 0; }
+
+.start ul { margin: 0; padding-left: 1.2rem; display: grid; gap: .25rem; font-size: .92rem; }
+.opts { display: grid; gap: .6rem; }
+.opt { display: flex; justify-content: space-between; align-items: center; gap: .6rem; font-size: .92rem; }
+select { font: inherit; font-weight: 700; padding: .35rem .5rem; border-radius: 10px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); }
+.switch { display: inline-flex; align-items: center; cursor: pointer; }
+.switch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.switch span { width: 2.6rem; height: 1.45rem; border-radius: 999px; background: var(--line); position: relative; transition: background .15s; }
+.switch span::after { content: ""; position: absolute; top: .2rem; left: .2rem; width: 1.05rem; height: 1.05rem; border-radius: 50%; background: #fff; transition: transform .15s; }
+.switch input:checked + span { background: var(--accent); }
+.switch input:checked + span::after { transform: translateX(1.15rem); }
+.warn { font-size: .85rem; background: var(--ng-soft); color: var(--ink); border-radius: 10px; padding: .6rem .75rem; }
+.note { font-size: .8rem; color: var(--muted); margin: 0; }
+
+/* results */
+.score { display: grid; grid-template-columns: 1fr 1fr; gap: .6rem; }
+.score div { background: var(--bg); border-radius: 12px; padding: .6rem; text-align: center; }
+.score b { font-family: var(--font-display); font-size: 1.8rem; font-variant-numeric: tabular-nums; }
+.tbl { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+th, td { padding: .4rem .3rem; border-top: 1px solid var(--line); text-align: left; vertical-align: top; }
+th { font-size: .72rem; color: var(--muted); letter-spacing: .05em; }
+td.n { width: 2rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+.res { display: grid; grid-template-columns: auto 1fr; gap: .1rem .35rem; align-items: start; }
+.res button { font: inherit; font-weight: 900; border: 0; background: none; padding: 0 .1rem; cursor: pointer; font-size: 1.05rem; line-height: 1.3; }
+.res .o { color: var(--ok); } .res .x { color: var(--ng); } .res .d { color: var(--muted); }
+.res small { grid-column: 2; color: var(--muted); font-size: .72rem; overflow-wrap: anywhere; }
+footer { font-size: .72rem; color: var(--muted); display: grid; gap: .15rem; }
+.top a { font-size: .82rem; color: var(--accent); text-decoration: none; font-weight: 700; }
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: .45rem; }
+.seg button { font: inherit; text-align: left; cursor: pointer; border-radius: 12px; border: 2px solid var(--line); background: var(--surface); color: var(--ink); padding: .55rem .7rem; display: grid; gap: .05rem; min-width: 0; }
+.seg button b { font-family: var(--font-display); font-size: 1rem; }
+.seg button span { font-size: .72rem; color: var(--muted); }
+.seg button[aria-pressed="true"] { border-color: var(--accent); background: var(--accent-soft); }
+.lbl { font-size: .78rem; font-weight: 700; color: var(--muted); letter-spacing: .04em; }
+.schip { font: inherit; font-size: .72rem; font-weight: 700; padding: .12rem .55rem; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+.schip.on { background: var(--accent-soft); border-color: var(--accent); color: var(--accent); }
+.subs { background: var(--bg); border-radius: 12px; padding: .5rem .7rem; display: grid; gap: .1rem; min-height: 3.9rem; align-content: end; }
+.sub { margin: 0; font-size: .93rem; line-height: 1.5; overflow-wrap: anywhere; }
+.sub.prev { font-size: .78rem; color: var(--muted); }
+.sub .who { font-weight: 700; font-size: .7rem; margin-right: .4rem; padding: .05rem .4rem; border-radius: 6px; border: 1px solid currentColor; }
+.who.ryu { color: var(--ng); } .who.zun { color: var(--accent); }
+.ansform { display: flex; gap: .45rem; }
+.ansform input { flex: 1 1 auto; min-width: 0; font: inherit; font-size: 1.15rem; padding: .6rem .75rem; border-radius: 12px; border: 2px solid var(--line); background: var(--surface); color: var(--ink); }
+.ansform input:focus { border-color: var(--accent); outline: none; }
+.ansform button { flex: 0 0 auto; font-size: 1rem; padding: .6rem 1rem; width: auto; }
+body.textmode .map { width: min(100%, calc(32vh * var(--map-ar, 1.54))); margin-inline: auto; }
+body.textmode .qtext { font-size: 1.3rem; min-height: 1.6em; }
+body.textmode .mic { display: none; }
+body.textmode #quizCard { gap: .55rem; }
+body.textmode .top, body.textmode footer { display: none; }
+body.textmode .big { font-size: 2.6rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <h1>アジア 白地図クイズ</h1><a href="./">問題集へ</a>
+    <div class="chips" aria-live="polite"><span class="chip">国名 <b id="sc">0</b></span><span class="chip">首都 <b id="sk">0</b></span></div>
+  </div>
+
+  <div class="map" id="map">
+    <div class="mapin" id="mapin"><img id="mapimg" alt="アジアの白地図（①〜㉔の番号つき）"><div class="ring" id="ring" hidden></div></div>
+    <div class="mapbtns"><button type="button" id="zoomin" aria-pressed="true">拡大</button><button type="button" id="zoomout" aria-pressed="false">全体</button></div>
+  </div>
+
+  <!-- start -->
+  <section class="card start" id="startCard">
+    <ul>
+      <li>①から順に、地図の番号の<b>国名</b>を声で答えます。</li>
+      <li>つぎに、その国の<b>首都</b>を声で答えます。</li>
+      <li id="howVoice">マイクのマークが緑になったら話してください。わからないときは「わからない」と言うか、ボタンを押します。</li>
+      <li id="howText" hidden>入力欄に答えを入れて「答える」を押します（ひらがな・カタカナ・漢字どれでもOK）。電車ではイヤホンで聞いてください。</li>
+    </ul>
+    <div class="lbl">答え方</div>
+    <div class="seg" role="group" aria-label="答え方">
+      <button type="button" id="am-voice" aria-pressed="true"><b>声で答える</b><span>家で。マイクに話す</span></button>
+      <button type="button" id="am-text" aria-pressed="false"><b>文字で答える</b><span>電車用。入力して答える</span></button>
+    </div>
+    <div class="opts">
+      <label class="opt" for="sound">音を出す（オフにすると字幕だけ）<span class="switch"><input type="checkbox" id="sound" checked><span></span></span></label>
+      <label class="opt" for="from">何番から始める？<select id="from"></select></label>
+      <label class="opt" for="intro">はじめに説明を聞く<span class="switch"><input type="checkbox" id="intro" checked><span></span></span></label>
+      <label class="opt" for="bgm">BGM<span class="switch"><input type="checkbox" id="bgm" checked><span></span></span></label>
+    </div>
+    <div class="warn" id="srWarn" hidden>このブラウザでは音声認識が使えません。AndroidのChromeで開いてください。いまは「画面のボタンで答え合わせ」するモードで動きます。</div>
+    <button type="button" class="b main" id="startBtn" disabled>音声を準備しています…</button>
+    <p class="note" id="startNote">はじめてのときは、マイクの使用を「許可」してください。静かな場所で使うと、よく聞き取れます。</p>
+  </section>
+
+  <!-- quiz -->
+  <section class="card" id="quizCard" hidden>
+    <div class="qhead"><span class="qno" id="qno">–</span><span style="display:flex;gap:.35rem;align-items:center"><button type="button" class="schip on" id="soundChip" aria-pressed="true">音：あり</button><span class="stage" id="stage">国名</span></span></div>
+    <div class="qtext" id="qtext"></div>
+    <div class="mark" id="mark"></div>
+    <div class="heard" id="heard"></div>
+    <div class="subs" aria-live="polite" aria-label="字幕"><p class="sub prev" id="subPrev"></p><p class="sub" id="subCur"></p></div>
+    <form class="ansform" id="ansForm" hidden autocomplete="off">
+      <input id="ans" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="done" placeholder="答えを入力（ひらがなでもOK）" aria-label="答え">
+      <button type="submit" class="b main">答える</button>
+    </form>
+    <div class="mic" id="mic">
+      <div class="micdot" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></div>
+      <div class="miclabel" id="miclabel">問題をよく聞いてね</div>
+    </div>
+    <div class="manual" id="manual" hidden>
+      <p>正解は <b id="manAns"></b>。言えた？</p>
+      <div class="row"><button type="button" class="b okb" id="manOk">○ 言えた</button><button type="button" class="b ngb" id="manNg">✕ 言えなかった</button></div>
+    </div>
+    <div class="row">
+      <button type="button" class="b" id="passBtn">わからない</button>
+      <button type="button" class="b" id="againBtn">もう一回</button>
+      <button type="button" class="b" id="pauseBtn">一時停止</button>
+    </div>
+  </section>
+
+  <!-- results -->
+  <section class="card" id="resCard" hidden>
+    <div class="qno">けっか</div>
+    <div class="score"><div>国名<br><b id="rc">0</b> / <span id="rn">24</span></div><div>首都<br><b id="rk">0</b> / <span id="rn2">24</span></div></div>
+    <p class="note">聞きまちがいで ✕ になったときは、○✕ をタップすると直せます。</p>
+    <div class="tbl"><table><thead><tr><th></th><th>国名</th><th>首都</th></tr></thead><tbody id="rtable"></tbody></table></div>
+    <div class="row"><button type="button" class="b main" id="retryBtn">まちがえた問題だけもう一度</button></div>
+    <div class="row"><button type="button" class="b" id="againAll">①から最初から</button><button type="button" class="b" id="toStart">番号を選んで始める</button></div>
+  </section>
+
+  <footer>
+    <div>声：VOICEVOX:青山龍星（問題）／VOICEVOX:ずんだもん（○✕）</div>
+    <div>地図：Natural Earth のデータをもとに作成</div>
+  </footer>
+</div>
+
+<script type="application/json" id="qdata">__DATA__</script>
+<script>
+__TEXTJUDGE__
+(function () {
+"use strict";
+var Q = JSON.parse(document.getElementById("qdata").textContent);
+var items = Q.items, N = items.length;
+var $ = function (id) { return document.getElementById(id); };
+var FAST = !!window.__QUIZ_FAST;
+var CIRC = "①②③④⑤⑥⑦⑧⑨⑩⑪⑫⑬⑭⑮⑯⑰⑱⑲⑳㉑㉒㉓㉔";
+
+/* ---------- 正解の別名・よくある聞きまちがい ---------- */
+var C_ALIAS = {
+  KOR: ["大韓民国", "カンコク"], PRK: ["朝鮮民主主義人民共和国", "キタチョウセン"], CHN: ["中華人民共和国", "チュウゴク"],
+  MNG: ["モンゴル国"], MMR: ["ミャンマ"], THA: ["鯛", "タイ王国"], VNM: ["ヴェトナム"], MYS: ["マレイシア", "マレシア"],
+  SGP: [], IDN: [], PHL: ["フィリピーン", "ヒリピン"], IND: ["印度"], PAK: [], BGD: ["バングラディシュ", "バングラデッシュ", "バングラ"],
+  NPL: ["ネパル"], BTN: ["ブタン"], KAZ: ["カザフ"], AFG: ["アフガン"], IRN: ["要らん"], IRQ: [], KWT: ["クエート", "クウェイト"],
+  SAU: ["サウジ"], ISR: ["イェスラエル"], TUR: []
+};
+var K_ALIAS = {
+  KOR: ["ソール"], PRK: ["ピョンヤン", "ヘイジョウ"], CHN: ["ペキン"], MNG: ["ウランバトール"],
+  MMR: ["ネピドー", "ネーピドー", "ネピドウ"], THA: ["万国"], VNM: [], MYS: ["クアラルンプル"], SGP: [], IDN: [],
+  PHL: [], IND: ["デリー", "ニューデリ"], PAK: ["イスラマバド"], BGD: [], NPL: ["カトマンドゥ"],
+  BTN: ["チンプー", "ティンプ", "ティンプウ"], KAZ: ["明日な"], AFG: ["カブル"], IRN: [], IRQ: ["バグダード", "バクダッド", "バグダット"],
+  KWT: ["クエート", "クウェイト"], SAU: ["リアド", "リヤード"], ISR: ["イェルサレム"], TUR: []
+};
+var READ = { "平壌": "ピョンヤン", "北京": "ペキン" };
+function norm(s) {
+  s = String(s || "").normalize("NFKC");
+  s = s.replace(/[ぁ-ゖ]/g, function (c) { return String.fromCharCode(c.charCodeAt(0) + 0x60); });
+  return s.replace(/[\sー－―‐\-~〜、。，．,.!！?？・「」『』()（）]/g, "");
+}
+var INDEX = [];
+items.forEach(function (it) {
+  [it.country].concat(C_ALIAS[it.code] || []).forEach(function (a) { INDEX.push({ a: norm(a), code: it.code, kind: "c" }); });
+  [it.capital, READ[it.capital] || ""].concat(K_ALIAS[it.code] || []).forEach(function (a) { if (a) INDEX.push({ a: norm(a), code: it.code, kind: "k" }); });
+});
+INDEX.sort(function (x, y) { return y.a.length - x.a.length; });
+var PASS = ["ワカラナイ", "ワカンナイ", "ワカラン", "ワカリマセン", "パス", "シラナイ"].map(norm);
+
+function matchesIn(t) {
+  for (var i = 0; i < INDEX.length; i++) {
+    if (t.indexOf(INDEX[i].a) >= 0) {
+      var a = INDEX[i].a;
+      return INDEX.filter(function (e) { return e.a === a; });
+    }
+  }
+  return [];
+}
+// kind: "c"=国名, "k"=首都 / alts: 認識候補の文字列
+function judge(kind, code, alts) {
+  var first = null;
+  for (var i = 0; i < alts.length; i++) {
+    var raw = alts[i], t = norm(raw);
+    if (!t) continue;
+    var m = matchesIn(t);
+    if (m.length) {
+      if (m.some(function (e) { return e.code === code && e.kind === kind; })) return { status: "hit", correct: true, heard: raw };
+      if (!first || first.status !== "hit") first = { status: "hit", correct: false, heard: raw };
+    } else if (PASS.some(function (p) { return t.indexOf(p) >= 0; })) {
+      if (!first) first = { status: "pass", heard: raw };
+    }
+  }
+  return first || { status: "none", heard: alts[0] || "" };
+}
+window.__judge = judge; // テスト用
+
+/* ---------- 地図 ---------- */
+var MP = Q.map, zoomOn = true, focusNo = 1;
+$("mapimg").src = Q.mapImg;
+$("map").style.setProperty("--map-ar", (MP.w / MP.h).toFixed(4));
+function focusMap(no) {
+  focusNo = no;
+  var p = MP.pos[no - 1], ring = $("ring");
+  ring.hidden = false; ring.style.left = (p.x * 100) + "%"; ring.style.top = (p.y * 100) + "%";
+  var Z = zoomOn ? 2.6 : 1;
+  var tx = Math.min(0, Math.max(1 - Z, 0.5 - p.x * Z)), ty = Math.min(0, Math.max(1 - Z, 0.5 - p.y * Z));
+  $("mapin").style.transform = "translate(" + (tx * 100) + "%," + (ty * 100) + "%) scale(" + Z + ")";
+}
+function setZoom(on) {
+  zoomOn = on; $("zoomin").setAttribute("aria-pressed", String(on)); $("zoomout").setAttribute("aria-pressed", String(!on));
+  focusMap(focusNo);
+}
+$("zoomin").onclick = function () { setZoom(true); };
+$("zoomout").onclick = function () { setZoom(false); };
+setZoom(false); $("ring").hidden = true;
+
+/* ---------- 音（声・効果音・BGM） ---------- */
+var AC = window.AudioContext || window.webkitAudioContext;
+var ctx = new AC(), master = ctx.createGain(), vGain = ctx.createGain(), bGain = ctx.createGain(), fGain = ctx.createGain();
+master.connect(ctx.destination); vGain.connect(master); bGain.connect(master); fGain.connect(master);
+vGain.gain.value = 1; bGain.gain.value = 0; fGain.gain.value = 0.45;
+var buffers = {};
+function b64(s) { var bin = atob(s), u = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u.buffer; }
+function decode(buf) { return new Promise(function (res, rej) { var p = ctx.decodeAudioData(buf, res, rej); if (p && p.then) p.then(res, rej); }); }
+var keys = Object.keys(Q.clips), loaded = 0;
+Promise.all(keys.map(function (k) {
+  return decode(b64(Q.clips[k])).then(function (b) { buffers[k] = b; loaded++; $("startBtn").textContent = "音声を準備しています… " + Math.round(loaded / keys.length * 100) + "%"; });
+})).then(function () { $("startBtn").disabled = false; $("startBtn").textContent = "スタート"; },
+         function () { $("startBtn").textContent = "音声を読み込めませんでした（ページを開き直してください）"; });
+
+var curSrc = null, curRes = null;
+function setSub(who, text) {
+  var prev = $("subPrev"), cur = $("subCur"); prev.innerHTML = cur.innerHTML; cur.innerHTML = "";
+  if (!text) return;
+  var w = document.createElement("span"); w.className = "who " + (who === "龍星" ? "ryu" : "zun"); w.textContent = who;
+  cur.appendChild(w); cur.appendChild(document.createTextNode(text));
+}
+function clearSubs() { $("subPrev").innerHTML = ""; $("subCur").innerHTML = ""; }
+function play(key) {
+  var sb = Q.subs[key]; if (sb) setSub(sb.who, sb.text);
+  return new Promise(function (res) {
+    if (FAST || !buffers[key]) { setTimeout(res, FAST ? 1 : 0); return; }
+    var s = ctx.createBufferSource(); s.buffer = buffers[key]; s.connect(vGain);
+    curSrc = s; curRes = res; bgmLevel("voice");
+    s.onended = function () { if (curSrc === s) { curSrc = null; curRes = null; bgmLevel("normal"); } res(); };
+    s.start();
+  });
+}
+function stopVoice() { if (curSrc) { var r = curRes; try { curSrc.onended = null; curSrc.stop(); } catch (e) {} curSrc = null; curRes = null; if (r) r(); } }
+function wait(ms) { return new Promise(function (r) { setTimeout(r, FAST ? 1 : ms); }); }
+function mtof(m) { return 440 * Math.pow(2, (m - 69) / 12); }
+function tone(f, t, dur, type, vol, dest) {
+  var o = ctx.createOscillator(), g = ctx.createGain(); o.type = type; o.frequency.value = f;
+  g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.012); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g); g.connect(dest); o.start(t); o.stop(t + dur + 0.03);
+}
+var SFX = {
+  ok: function () { var t = ctx.currentTime; tone(1318.5, t, .32, "sine", .7, fGain); tone(2637, t, .2, "sine", .12, fGain); tone(1046.5, t + .2, .75, "sine", .7, fGain); tone(2093, t + .2, .4, "sine", .1, fGain); },
+  ng: function () { var t = ctx.currentTime; tone(147, t, .2, "sawtooth", .32, fGain); tone(110, t, .2, "square", .12, fGain); tone(147, t + .27, .5, "sawtooth", .32, fGain); tone(110, t + .27, .5, "square", .12, fGain); },
+  start: function () { var t = ctx.currentTime; [72, 76, 79, 84].forEach(function (m, i) { tone(mtof(m), t + i * .09, .3, "triangle", .5, fGain); }); },
+  streak: function () { var t = ctx.currentTime; [79, 83, 86, 91, 95].forEach(function (m, i) { tone(mtof(m), t + i * .06, .22, "square", .16, fGain); }); },
+  fanfare: function () { var t = ctx.currentTime; [[72,0],[72,.15],[72,.3],[76,.45],[79,.75],[84,1.05]].forEach(function (n) { tone(mtof(n[0]), t + n[1], n[0] === 84 ? 1.2 : .22, "triangle", .55, fGain); tone(mtof(n[0] - 12), t + n[1], .25, "square", .08, fGain); }); }
+};
+// BGM：明るいループ（その場で合成）
+var MEL = [76,79,81,79, 76,74,72,74, 76,79,81,84, 81,79,76,74, 72,74,76,79, 81,79,76,72, 74,76,74,72, 69,72,74,0];
+var BAS = [48,0,55,0, 45,0,52,0, 41,0,48,0, 43,0,50,0, 48,0,55,0, 45,0,52,0, 41,0,48,0, 43,0,47,0];
+var STEP = 60 / 116 / 2, bStep = 0, bNext = 0, bTimer = null, bgmWanted = true, bState = "normal";
+function bgmTick() {
+  while (bNext < ctx.currentTime + 0.15) {
+    var i = bStep % MEL.length;
+    if (MEL[i]) tone(mtof(MEL[i]), bNext, STEP * .85, "triangle", .22, bGain);
+    if (BAS[i]) tone(mtof(BAS[i]), bNext, STEP * 1.7, "sine", .38, bGain);
+    if (i % 2 === 0) tone(mtof(96), bNext, .03, "square", .02, bGain);
+    bStep++; bNext += STEP;
+  }
+}
+function bgmStart() { if (bTimer || FAST) return; bNext = ctx.currentTime + 0.05; bTimer = setInterval(bgmTick, 40); bgmLevel(bState); }
+function bgmStop() { if (bTimer) { clearInterval(bTimer); bTimer = null; } bGain.gain.setTargetAtTime(0, ctx.currentTime, .05); }
+function bgmLevel(s) {
+  bState = s;
+  var v = !bgmWanted ? 0 : s === "voice" ? .05 : s === "listen" || s === "off" ? 0 : .16;
+  bGain.gain.setTargetAtTime(v, ctx.currentTime, s === "listen" ? .03 : .15);
+}
+
+/* ---------- 音声認識 ---------- */
+var SRec = window.SpeechRecognition || window.webkitSpeechRecognition;
+var curRec = null, passFlag = false, manualOnly = !SRec;
+if (!SRec) $("srWarn").hidden = false;
+function listenOnce(ms) {
+  return new Promise(function (resolve) {
+    var rec, done = false, finals = null, interim = "", timer;
+    function finish(r) { if (done) return; done = true; clearTimeout(timer); curRec = null; try { rec.abort(); } catch (e) {} resolve(r); }
+    try { rec = new SRec(); } catch (e) { resolve({ error: "start" }); return; }
+    rec.lang = "ja-JP"; rec.interimResults = true; rec.maxAlternatives = 5; rec.continuous = false;
+    rec.onresult = function (e) {
+      for (var i = e.resultIndex; i < e.results.length; i++) {
+        var r = e.results[i], alts = [];
+        for (var j = 0; j < r.length; j++) alts.push(r[j].transcript);
+        if (r.isFinal) { finals = alts; finish({ alts: finals }); return; }
+        interim = alts[0] || ""; showHeard(interim, true);
+      }
+    };
+    rec.onerror = function (e) {
+      if (e.error === "not-allowed" || e.error === "service-not-allowed") finish({ error: "denied" });
+      else if (e.error === "aborted" && passFlag) finish({ pass: true });
+      else finish({ alts: interim ? [interim] : [] });
+    };
+    rec.onend = function () { finish(passFlag ? { pass: true } : { alts: finals || (interim ? [interim] : []) }); };
+    curRec = rec;
+    timer = setTimeout(function () { try { rec.stop(); } catch (e) {} }, ms);
+    try { rec.start(); } catch (e) { finish({ error: "start" }); }
+  });
+}
+function abortRec() { if (curRec) { try { curRec.abort(); } catch (e) {} curRec = null; } }
+
+/* ---------- 画面 ---------- */
+function show(id) { ["startCard", "quizCard", "resCard"].forEach(function (c) { $(c).hidden = c !== id; }); }
+function setMic(state, label) { $("mic").className = "mic" + (state === "on" ? " on" : ""); $("miclabel").textContent = label; }
+function showHeard(t, interim) { $("heard").innerHTML = t ? (interim ? "聞こえています：" : (ansMode === "text" ? "あなたの答え：" : "聞こえた答え：")) + "<b></b>" : ""; if (t) $("heard").querySelector("b").textContent = t; }
+function showMark(ok, ans) {
+  var m = $("mark"); m.innerHTML = "";
+  if (ok === null) return;
+  var s = document.createElement("span"); s.className = "big " + (ok ? "ok" : "ng"); s.textContent = ok ? "○" : "✕"; m.appendChild(s);
+  if (!ok && ans) { var d = document.createElement("div"); d.className = "ans"; d.textContent = ans.indexOf("おしい") === 0 ? ans.replace("おしい！ ", "おしい！ 正解：") : "正解：" + ans; m.appendChild(d); }
+}
+function updateScore() {
+  var c = 0, k = 0;
+  Object.keys(res).forEach(function (n) { if (res[n].c && res[n].c.ok) c++; if (res[n].k && res[n].k.ok) k++; });
+  $("sc").textContent = c; $("sk").textContent = k;
+  return { c: c, k: k };
+}
+var from = $("from");
+items.forEach(function (it, i) { var o = document.createElement("option"); o.value = i; o.textContent = CIRC[i] + " " + (i === 0 ? "（最初から）" : ""); from.appendChild(o); });
+try {
+  if (localStorage.getItem("asiaquiz.bgm") === "0") $("bgm").checked = false;
+} catch (e) {}
+$("bgm").onchange = function () { bgmWanted = this.checked; try { localStorage.setItem("asiaquiz.bgm", bgmWanted ? "1" : "0"); } catch (e) {} bgmLevel(bState); };
+bgmWanted = $("bgm").checked;
+var soundOn = true, ansMode = SRec ? "voice" : "text";
+try { if (localStorage.getItem("asiaquiz.sound") === "0") soundOn = false; var am = localStorage.getItem("asiaquiz.ans"); if (am === "text" || (am === "voice" && SRec)) ansMode = am; } catch (e) {}
+var hh = (location.hash || "").replace("#", ""); if (hh === "text" || hh === "voice") ansMode = hh;
+function setSound(on) {
+  soundOn = on; master.gain.value = on ? 1 : 0; $("sound").checked = on;
+  var c = $("soundChip"); c.textContent = on ? "音：あり" : "音：なし（字幕のみ）"; c.className = "schip" + (on ? " on" : ""); c.setAttribute("aria-pressed", String(on));
+  try { localStorage.setItem("asiaquiz.sound", on ? "1" : "0"); } catch (e) {}
+}
+$("sound").onchange = function () { setSound(this.checked); };
+$("soundChip").onclick = function () { setSound(!soundOn); };
+function setAnsMode(m) {
+  ansMode = m;
+  $("am-voice").setAttribute("aria-pressed", String(m === "voice")); $("am-text").setAttribute("aria-pressed", String(m === "text"));
+  $("howVoice").hidden = m !== "voice"; $("howText").hidden = m !== "text";
+  $("startNote").textContent = m === "voice" ? "はじめてのときは、マイクの使用を「許可」してください。静かな場所で使うと、よく聞き取れます。"
+    : "電車ではイヤホンで。音を出せないときは「音を出す」をオフにすると、字幕だけで進められます。";
+  $("srWarn").hidden = !(m === "voice" && !SRec);
+  try { localStorage.setItem("asiaquiz.ans", m); } catch (e) {}
+}
+$("am-voice").onclick = function () { setAnsMode("voice"); };
+$("am-text").onclick = function () { setAnsMode("text"); };
+setSound(soundOn); setAnsMode(ansMode);
+
+/* ---------- 進行 ---------- */
+var res = {}, st = { list: [], pos: 0, stage: "c", token: 0, intro: false, retry: false, mode: "idle", streak: 0 }, wake = null;
+function alive(t) { return t === st.token; }
+
+function askManual(kind, it) {
+  return new Promise(function (resolve) {
+    $("manAns").textContent = kind === "c" ? it.country : it.capital;
+    $("manual").hidden = false;
+    var my = st.token;
+    var done = function (ok) { $("manual").hidden = true; $("manOk").onclick = $("manNg").onclick = null; resolve({ ok: ok, heard: "（ボタンで答え合わせ）" }); };
+    $("manOk").onclick = function () { done(true); }; $("manNg").onclick = function () { done(false); };
+    st.cancelManual = function () { $("manual").hidden = true; resolve({ aborted: true }); };
+  });
+}
+var textResolve = null;
+$("ansForm").addEventListener("submit", function (e) {
+  e.preventDefault();
+  var v = $("ans").value; if (!textResolve || !v.trim()) return;
+  var r = textResolve; textResolve = null; r({ text: v });
+});
+function answerText(kind, it) {
+  var my = st.token;
+  $("ans").value = "";
+  try { $("ans").focus({ preventScroll: true }); } catch (e) { $("ans").focus(); }
+  return new Promise(function (resolve) {
+    textResolve = function (r) {
+      if (my !== st.token) { resolve({ aborted: true }); return; }
+      if (r.pass) { showHeard("わからない"); resolve({ ok: false, heard: "わからない" }); return; }
+      var j = textJudge(kind, it.code, r.text);
+      showHeard(r.text);
+      resolve({ ok: j.status === "correct", heard: r.text, close: j.status === "close" });
+    };
+    st.cancelText = function () { if (textResolve) { textResolve = null; resolve({ aborted: true }); } };
+  });
+}
+async function answer(kind, it) {
+  if (ansMode === "text") return answerText(kind, it);
+  var my = st.token, last = "";
+  if (manualOnly) { setMic("off", "ボタンで答え合わせしてね"); return askManual(kind, it); }
+  for (var attempt = 0; attempt < 3; attempt++) {
+    passFlag = false; showHeard("");
+    setMic("on", "話してね"); bgmLevel("listen");
+    var r = await listenOnce(8000);
+    setMic("off", "判定中…"); bgmLevel("normal");
+    if (!alive(my)) return { aborted: true };
+    if (r.pass) { passFlag = false; return { ok: false, heard: "わからない" }; }
+    if (r.error === "denied") { manualOnly = true; $("srWarn").hidden = false; $("srWarn").textContent = "マイクが許可されていません。Chromeの設定でマイクを許可すると、声で答えられます。いまはボタンで答え合わせします。"; return askManual(kind, it); }
+    var j = judge(kind, it.code, r.alts || []);
+    if (j.heard) { last = j.heard; showHeard(j.heard); }
+    if (j.status === "hit") return { ok: j.correct, heard: j.heard };
+    if (j.status === "pass") return { ok: false, heard: j.heard };
+    if (attempt < 2) { setMic("off", "もう一回言ってね"); await play("retry"); if (!alive(my)) return { aborted: true }; }
+  }
+  setMic("off", "ボタンで答え合わせしてね");
+  await play("manual"); if (!alive(my)) return { aborted: true };
+  var m = await askManual(kind, it);
+  if (m.ok !== undefined && last) m.heard = last + "（ボタン）";
+  return m;
+}
+async function okFx(my) {
+  st.streak++; showMark(true); SFX.ok(); await wait(700); if (!alive(my)) return;
+  if (st.streak % 5 === 0) { SFX.streak(); await play("streak"); }
+  else await play("praise" + (1 + Math.floor(Math.random() * 5)));
+}
+async function ngFx(my, ans, close) { st.streak = 0; showMark(false, (close ? "おしい！ " : "") + ans); SFX.ng(); await wait(850); }
+function record(n, kind, r) { res[n] = res[n] || {}; res[n][kind] = { ok: !!r.ok, heard: r.heard || "" }; updateScore(); }
+
+async function run() {
+  var my = ++st.token; st.mode = "run"; $("pauseBtn").textContent = "一時停止";
+  if (st.intro) {
+    st.intro = false;
+    $("qno").innerHTML = "説明"; $("qtext").textContent = "使い方を聞いてね"; setMic("off", "説明中"); showHeard(""); showMark(null);
+    for (var i = 1; i <= 5; i++) { await play((ansMode === "text" && (i === 2 || i === 4) ? "txintro" : "intro") + i); if (!alive(my)) return; await wait(250); if (!alive(my)) return; }
+  }
+  if (st.retry && st.pos === 0 && st.stage === "c") { await play("retryIntro"); if (!alive(my)) return; }
+  while (st.pos < st.list.length) {
+    var it = items[st.list[st.pos]], n = it.no;
+    focusMap(n); showMark(null); showHeard("");
+    $("qno").innerHTML = CIRC[n - 1] + " <small>" + (st.pos + 1) + " / " + st.list.length + "</small>";
+    if (st.stage === "c") {
+      $("stage").textContent = "国名"; $("qtext").textContent = CIRC[n - 1] + "の国の名前は？"; setMic("off", "問題をよく聞いてね");
+      await play("qc" + n); if (!alive(my)) return;
+      var r = await answer("c", it); if (!alive(my) || r.aborted) return;
+      record(n, "c", r); st.stage = "k";
+      if (r.ok) { await okFx(my); if (!alive(my)) return; await play("okc" + n); }
+      else { await ngFx(my, it.country, r.close); if (!alive(my)) return; await play("ngc" + n); if (!alive(my)) return; await play("qk" + n); }
+      if (!alive(my)) return;
+    } else {
+      $("stage").textContent = "首都"; $("qtext").textContent = it.country + "の首都は？"; setMic("off", "問題をよく聞いてね");
+      await play("qk" + n); if (!alive(my)) return;
+    }
+    showMark(null); showHeard("");
+    $("stage").textContent = "首都"; $("qtext").textContent = it.country + "の首都は？";
+    var r2 = await answer("k", it); if (!alive(my) || r2.aborted) return;
+    record(n, "k", r2);
+    if (r2.ok) await okFx(my); else { await ngFx(my, it.capital, r2.close); if (!alive(my)) return; await play("ngk" + n); }
+    if (!alive(my)) return;
+    st.stage = "c"; st.pos++;
+    await wait(500); if (!alive(my)) return;
+  }
+  finish(my);
+}
+async function finish(my) {
+  st.mode = "done";
+  setMic("off", "おわり"); showMark(null);
+  await play(st.retry ? "end2" : "end"); if (!alive(my)) return;
+  var nums = st.list.map(function (i) { return items[i].no; }), c = 0, k = 0;
+  nums.forEach(function (n) { if (res[n] && res[n].c && res[n].c.ok) c++; if (res[n] && res[n].k && res[n].k.ok) k++; });
+  var rate = (c + k) / (nums.length * 2);
+  SFX.fanfare(); await wait(1500); if (!alive(my)) return;
+  showResults();
+  await play(rate === 1 ? "resPerfect" : rate >= .75 ? "resGood" : "resMore");
+  releaseWake();
+}
+function showResults() {
+  bgmStop(); document.body.classList.remove("textmode"); show("resCard"); $("ring").hidden = true; setZoom(false); $("ring").hidden = true;
+  var tb = $("rtable"); tb.innerHTML = "";
+  items.forEach(function (it) {
+    var tr = document.createElement("tr"), n = it.no, r = res[n] || {};
+    tr.innerHTML = "<td class='n'>" + CIRC[n - 1] + "</td><td></td><td></td>";
+    [["c", it.country], ["k", it.capital]].forEach(function (p, ci) {
+      var td = tr.children[ci + 1], box = document.createElement("div"); box.className = "res";
+      var b = document.createElement("button"), x = r[p[0]];
+      b.type = "button"; b.className = x ? (x.ok ? "o" : "x") : "d"; b.textContent = x ? (x.ok ? "○" : "✕") : "–";
+      b.setAttribute("aria-label", p[1] + (x ? (x.ok ? " 正解" : " 不正解") : " 未回答") + "（タップで切りかえ）");
+      if (x) b.onclick = function () { x.ok = !x.ok; showResults(); };
+      var nm = document.createElement("span"); nm.textContent = p[1];
+      box.appendChild(b); box.appendChild(nm);
+      if (x && x.heard) { var sm = document.createElement("small"); sm.textContent = (ansMode === "text" ? "入力：" : "答え：") + x.heard; box.appendChild(sm); }
+      td.appendChild(box);
+    });
+    tb.appendChild(tr);
+  });
+  var nums = st.list.map(function (i) { return items[i].no; });
+  var c = 0, k = 0; nums.forEach(function (n) { if (res[n] && res[n].c && res[n].c.ok) c++; if (res[n] && res[n].k && res[n].k.ok) k++; });
+  $("rc").textContent = c; $("rk").textContent = k; $("rn").textContent = $("rn2").textContent = nums.length;
+  updateScore();
+  var wrong = items.filter(function (it) { var r = res[it.no]; return r && ((r.c && !r.c.ok) || (r.k && !r.k.ok)); });
+  $("retryBtn").disabled = wrong.length === 0;
+  $("retryBtn").textContent = wrong.length ? "まちがえた問題だけもう一度（" + wrong.length + "問）" : "まちがいなし！";
+}
+function requestWake() { if (navigator.wakeLock && navigator.wakeLock.request) navigator.wakeLock.request("screen").then(function (w) { wake = w; }, function () {}); }
+function releaseWake() { if (wake && wake.release) { wake.release().catch(function () {}); wake = null; } }
+
+async function begin(list, opts) {
+  await ctx.resume();
+  document.body.classList.toggle("textmode", ansMode === "text");
+  $("ansForm").hidden = ansMode !== "text"; clearSubs();
+  if (ansMode === "voice" && !manualOnly && navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+    try { var s = await navigator.mediaDevices.getUserMedia({ audio: true }); s.getTracks().forEach(function (t) { t.stop(); }); }
+    catch (e) { manualOnly = true; $("srWarn").hidden = false; $("srWarn").textContent = "マイクが許可されていません。Chromeの設定でマイクを許可すると、声で答えられます。いまはボタンで答え合わせします。"; }
+  }
+  list.forEach(function (i) { delete res[items[i].no]; });
+  st.list = list; st.pos = 0; st.stage = "c"; st.streak = 0; st.intro = !!opts.intro; st.retry = !!opts.retry;
+  updateScore(); show("quizCard"); setZoom(true); focusMap(items[list[0]].no);
+  SFX.start(); bgmStart(); requestWake();
+  await wait(600);
+  run();
+}
+$("startBtn").onclick = function () {
+  var f = +from.value, list = [];
+  for (var i = f; i < N; i++) list.push(i);
+  begin(list, { intro: $("intro").checked });
+};
+$("retryBtn").onclick = function () {
+  var list = [];
+  items.forEach(function (it, i) { var r = res[it.no]; if (r && ((r.c && !r.c.ok) || (r.k && !r.k.ok))) list.push(i); });
+  if (list.length) begin(list, { retry: true });
+};
+$("againAll").onclick = function () { res = {}; begin(items.map(function (_, i) { return i; }), { intro: false }); };
+$("toStart").onclick = function () { st.token++; document.body.classList.remove("textmode"); show("startCard"); setZoom(false); $("ring").hidden = true; };
+
+function pause() {
+  if (st.mode !== "run") return;
+  st.token++; stopVoice(); passFlag = false; abortRec(); if (st.cancelManual) st.cancelManual(); if (st.cancelText) st.cancelText();
+  st.mode = "paused"; setMic("off", "一時停止中"); bgmLevel("off"); $("pauseBtn").textContent = "再開"; releaseWake();
+}
+function resume() { if (st.mode !== "paused") return; bgmLevel("normal"); requestWake(); run(); }
+$("pauseBtn").onclick = function () { if (st.mode === "run") pause(); else if (st.mode === "paused") resume(); };
+$("againBtn").onclick = function () { if (st.mode === "run") { pause(); resume(); } else if (st.mode === "paused") resume(); };
+$("passBtn").onclick = function () {
+  if (ansMode === "text") { if (textResolve) { var r = textResolve; textResolve = null; r({ pass: true }); } return; }
+  if (curRec) { passFlag = true; try { curRec.abort(); } catch (e) {} }
+};
+document.addEventListener("visibilitychange", function () { if (document.hidden && ansMode === "voice") pause(); });
+window.__quizState = function () { return { res: res, st: { pos: st.pos, stage: st.stage, mode: st.mode, list: st.list.slice() } }; };
+})();
+</script>
+</body>
+</html>

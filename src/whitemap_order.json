@@ -1,0 +1,194 @@
+[
+ {
+  "no": 1,
+  "code": "KOR",
+  "country": "韓国",
+  "capital": "ソウル",
+  "region": "東アジア",
+  "lon": 127.85
+ },
+ {
+  "no": 2,
+  "code": "PRK",
+  "country": "北朝鮮",
+  "capital": "平壌",
+  "region": "東アジア",
+  "lon": 127.0
+ },
+ {
+  "no": 3,
+  "code": "PHL",
+  "country": "フィリピン",
+  "capital": "マニラ",
+  "region": "東南アジア",
+  "lon": 121.1
+ },
+ {
+  "no": 4,
+  "code": "IDN",
+  "country": "インドネシア",
+  "capital": "ジャカルタ",
+  "region": "東南アジア",
+  "lon": 113.9
+ },
+ {
+  "no": 5,
+  "code": "VNM",
+  "country": "ベトナム",
+  "capital": "ハノイ",
+  "region": "東南アジア",
+  "lon": 105.7
+ },
+ {
+  "no": 6,
+  "code": "CHN",
+  "country": "中国",
+  "capital": "北京",
+  "region": "東アジア",
+  "lon": 104.0
+ },
+ {
+  "no": 7,
+  "code": "SGP",
+  "country": "シンガポール",
+  "capital": "シンガポール",
+  "region": "東南アジア",
+  "lon": 103.82
+ },
+ {
+  "no": 8,
+  "code": "MNG",
+  "country": "モンゴル",
+  "capital": "ウランバートル",
+  "region": "東アジア",
+  "lon": 103.1
+ },
+ {
+  "no": 9,
+  "code": "MYS",
+  "country": "マレーシア",
+  "capital": "クアラルンプール",
+  "region": "東南アジア",
+  "lon": 102.2
+ },
+ {
+  "no": 10,
+  "code": "THA",
+  "country": "タイ",
+  "capital": "バンコク",
+  "region": "東南アジア",
+  "lon": 101.0
+ },
+ {
+  "no": 11,
+  "code": "MMR",
+  "country": "ミャンマー",
+  "capital": "ネーピードー",
+  "region": "東南アジア",
+  "lon": 96.3
+ },
+ {
+  "no": 12,
+  "code": "BTN",
+  "country": "ブータン",
+  "capital": "ティンプー",
+  "region": "南アジア",
+  "lon": 90.45
+ },
+ {
+  "no": 13,
+  "code": "BGD",
+  "country": "バングラデシュ",
+  "capital": "ダッカ",
+  "region": "南アジア",
+  "lon": 90.25
+ },
+ {
+  "no": 14,
+  "code": "NPL",
+  "country": "ネパール",
+  "capital": "カトマンズ",
+  "region": "南アジア",
+  "lon": 84.0
+ },
+ {
+  "no": 15,
+  "code": "IND",
+  "country": "インド",
+  "capital": "ニューデリー",
+  "region": "南アジア",
+  "lon": 79.5
+ },
+ {
+  "no": 16,
+  "code": "PAK",
+  "country": "パキスタン",
+  "capital": "イスラマバード",
+  "region": "南アジア",
+  "lon": 69.2
+ },
+ {
+  "no": 17,
+  "code": "KAZ",
+  "country": "カザフスタン",
+  "capital": "アスタナ",
+  "region": "中央アジア",
+  "lon": 67.3
+ },
+ {
+  "no": 18,
+  "code": "AFG",
+  "country": "アフガニスタン",
+  "capital": "カブール",
+  "region": "西アジア",
+  "lon": 65.9
+ },
+ {
+  "no": 19,
+  "code": "IRN",
+  "country": "イラン",
+  "capital": "テヘラン",
+  "region": "西アジア",
+  "lon": 54.4
+ },
+ {
+  "no": 20,
+  "code": "KWT",
+  "country": "クウェート",
+  "capital": "クウェート",
+  "region": "西アジア",
+  "lon": 47.6
+ },
+ {
+  "no": 21,
+  "code": "SAU",
+  "country": "サウジアラビア",
+  "capital": "リヤド",
+  "region": "西アジア",
+  "lon": 44.7
+ },
+ {
+  "no": 22,
+  "code": "IRQ",
+  "country": "イラク",
+  "capital": "バグダッド",
+  "region": "西アジア",
+  "lon": 43.8
+ },
+ {
+  "no": 23,
+  "code": "TUR",
+  "country": "トルコ",
+  "capital": "アンカラ",
+  "region": "西アジア",
+  "lon": 35.2
+ },
+ {
+  "no": 24,
+  "code": "ISR",
+  "country": "イスラエル",
+  "capital": "エルサレム",
+  "region": "西アジア",
+  "lon": 34.8
+ }
+]
