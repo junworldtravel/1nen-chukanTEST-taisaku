@@ -1,14 +1,18 @@
 # asia-quiz 元データ（src）
 
-公開ページ（リポジトリ直下の index.html / drill.html / map.html）を作るための元データです。
+公開ページ（リポジトリ直下の index.html ほか）を作るための元データです。
 新しいパターンを追加するときは、ここから作業を始めます。
 
 ## ページ構成
 | 公開ファイル | 内容 | 元になるファイル |
 |---|---|---|
-| index.html | 問題集メニュー（パターンを増やしたらここにカードを追加） | リポジトリ直下の index.html を直接編集 |
-| drill.html | ① 首都の暗記ドリル（Excel 24組／暗唱・文字入力） | drill_template.html + drill_v2.json + textjudge.js |
-| map.html | ② 白地図クイズ（24か国／声・文字入力） | map_template.html + map_v2_audio.json + app_map.* + whitemap_order.json + textjudge.js |
+| index.html | 問題集ポータル（地域ごと：アジア全域／中東・湾岸／欧州全域。問題を増やしたらカードを追加） | リポジトリ直下の index.html を直接編集 |
+| drill.html | アジア全域 首都-国名match（Excel 24組／暗唱・文字入力） | drill_template.html + drill_v2.json + textjudge.js |
+| map.html | アジア全域 白地図から首都＆国名回答（24か国／声・文字入力） | map_template.html + map_v2_audio.json + app_map.* + whitemap_order.json + textjudge.js |
+| me-map.html | ①-1 中東/湾岸 白地図から首都＆国名回答（27問） | quiz3_template.html + quizzes_v3.json + v3_audio.json + me_map.* |
+| me-qa.html | ①-2 中東/湾岸 民族・宗教紛争・戦争・資源（一問一答19問） | quiz3_template.html + quizzes_v3.json + v3_audio.json |
+| eu-map.html | ②-1 欧州 地図から地形の名称回答（20問） | quiz3_template.html + quizzes_v3.json + v3_audio.json + eu_map.* |
+| eu-qa.html | ②-2 欧州 気候・宗教・言語（一問一答19問） | quiz3_template.html + quizzes_v3.json + v3_audio.json |
 
 ## データ
 - excel_24pairs.xlsx：①の出題範囲（配布Excel）
@@ -17,6 +21,14 @@
 - whitemap_24.pdf：印刷用白地図（地図・解答らん・答え）
 - drill_v2.json / map_v2_audio.json：声（MP3をbase64で格納）と字幕テキスト
 - textjudge.js：文字入力の判定（ひらがな・カタカナ・漢字対応、1文字ちがいは「おしい」）
+
+## 続編（中東・欧州）の共通エンジン
+- quiz3_template.html：データだけ差しかえて使える共通ページ。出題は a）声／b）文字、答えは 声／文字、順番は番号順／ランダム
+- quizzes_v3.json：4問題の出題データ（content_v3.py で作成。accept＝文字入力で正解にする表記、voice＝聞きまちがい候補、kw＝キーワード判定）
+- v3_audio.json：問題（龍星）と答え（ずんだもん）の声と字幕（gen_v3_audio.py で作成）
+- me_map.* / eu_map.*：地図画像と番号の位置（maps_v3.py で作成）
+- 組み立て：assemble_v3.py → site/ に me-map.html など4ページ。テスト：test_v3.py
+- 新しい単元を足すときは、content_v3.py に問題を追加 → maps_v3.py（地図があれば）→ gen_v3_audio.py → assemble_v3.py → test_v3.py
 
 ## 作り直しの流れ（作業環境での手順）
 作業フォルダ（scratchpad）に次の配置で置いて実行します。
@@ -28,5 +40,5 @@
 5. 公開：GitHub のアップロード画面からリポジトリ直下へ（公開前に必ず確認）
 
 ## 声・地図のクレジット
-- 声：VOICEVOX:四国めたん／VOICEVOX:ずんだもん（①）、VOICEVOX:青山龍星／VOICEVOX:ずんだもん（②）
+- 声：VOICEVOX:四国めたん／VOICEVOX:ずんだもん（首都-国名match）、VOICEVOX:青山龍星／VOICEVOX:ずんだもん（白地図・中東・欧州）
 - 地図：Natural Earth（パブリックドメイン）
