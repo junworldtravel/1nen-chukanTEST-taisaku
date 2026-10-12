@@ -6,13 +6,14 @@
 ## ページ構成
 | 公開ファイル | 内容 | 元になるファイル |
 |---|---|---|
-| index.html | 問題集ポータル（地域ごと：アジア全域／中東・湾岸／欧州全域／英語。問題を増やしたらカードを追加） | リポジトリ直下の index.html を直接編集 |
+| index.html | 問題集ポータル（地域ごと：アジア全域（首都match・白地図・東〜南アジア一問一答）／中東・湾岸／欧州全域／英語。問題を増やしたらカードを追加） | リポジトリ直下の index.html を直接編集 |
 | drill.html | アジア全域 首都-国名match（Excel 24組／暗唱・文字入力） | drill_template.html + drill_v2.json + textjudge.js |
 | map.html | アジア全域 白地図から首都＆国名回答（24か国／声・文字入力） | map_template.html + map_v2_audio.json + app_map.* + whitemap_order.json + textjudge.js |
 | me-map.html | ①-1 中東/湾岸 白地図から首都＆国名回答（27問） | quiz3_template.html + quizzes_v3.json + v3_audio.json + me_map.* |
 | me-qa.html | ①-2 中東/湾岸 民族・宗教紛争・戦争・資源（一問一答19問） | quiz3_template.html + quizzes_v3.json + v3_audio.json |
 | eu-map.html | ②-1 欧州 地図から地形の名称回答（20問） | quiz3_template.html + quizzes_v3.json + v3_audio.json + eu_map.* |
 | eu-qa.html | ②-2 欧州 気候・宗教・言語（一問一答19問） | quiz3_template.html + quizzes_v3.json + v3_audio.json |
+| as-qa.html | ③ アジア 東アジア〜南アジア 地理・自然と文化・農工業（一問一答68問） | quiz3_template.html + quizzes_v3.json + v3_audio.json |
 | reibun3.html | ③ 英語 基本例文集③（20文／和文→英作・英文→和訳／文字入力） | reibun_template.html + reibun3_v1.json + textjudge.js |
 
 ## データ
@@ -31,6 +32,7 @@
 - v3_audio.json：問題（龍星）と答え（ずんだもん）の声と字幕（gen_v3_audio.py で作成）
 - me_map.* / eu_map.*：地図画像と番号の位置（maps_v3.py で作成）
 - 組み立て：assemble_v3.py → site/ に me-map.html など4ページ。テスト：test_v3.py
+- as-qa（アジア一問一答）：content_v3.py の AS_QA に問題を足す → `ONLY=as-qa python3 gen_v3_audio.py <作業フォルダ> build`（既存の声はそのまま、as-qa の声だけ追加）→ assemble_v3.py → test_as.py。声モデルは 0.vvm と 15.vvm
 - 新しい単元を足すときは、content_v3.py に問題を追加 → maps_v3.py（地図があれば）→ gen_v3_audio.py → assemble_v3.py → test_v3.py
 
 ## ③ 英語 基本例文集③

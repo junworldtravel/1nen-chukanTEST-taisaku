@@ -9,7 +9,7 @@ WHO = {R: "龍星", Z: "ずんだもん"}
 Q = json.load(open(D + "/quizzes_v3.json"))
 
 # 読みまちがいの直し（表示はそのまま、読み上げだけ書きかえる）
-SPEAK_FIX = {"、平原、": "、へいげん、", "冷帯": "れいたい", "何問題": "なに問題", "日本の": "にほんの"}
+SPEAK_FIX = {"、平原、": "、へいげん、", "冷帯": "れいたい", "何問題": "なに問題", "日本の": "にほんの", "長江": "ちょうこう", "重慶": "チョンチン"}
 KANA_FIX = {}   # 文 → AquesTalk風カナ（どうしても直らないとき）
 def sp(t):
     for a, b in SPEAK_FIX.items(): t = t.replace(a, b)
@@ -49,7 +49,8 @@ def quiz_lines(qz):
             L[f"a{i}_{j}"] = (Z, strip_ng(s["ng"]), strip_ng(s["ngs"]))
     return L
 
-ALL = {qz["id"]: quiz_lines(qz) for qz in Q}
+ONLY = os.environ.get("ONLY")
+ALL = {qz["id"]: quiz_lines(qz) for qz in Q if not ONLY or qz["id"] == ONLY}
 
 from voicevox_core.blocking import Onnxruntime, OpenJtalk, Synthesizer, VoiceModelFile
 ort = Onnxruntime.load_once(filename=D + "/vv/voicevox_onnxruntime-linux-x64-1.17.3/lib/libvoicevox_onnxruntime.so")
@@ -88,7 +89,7 @@ def synth_mp3(t, spk):
         os.remove(wav)
     return base64.b64encode(open(mp3, "rb").read()).decode()
 
-OUT = {}
+OUT = json.load(open(D + "/v3_audio.json")) if ONLY else {}
 for qid, L in ALL.items():
     clips, subs = {}, {}
     for key, (spk, sub, say) in L.items():

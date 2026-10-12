@@ -21,6 +21,7 @@ YOMI = {
 YL = sorted(YOMI.items(), key=lambda kv: -len(kv[0]))
 THEME = {
  "me": ("#B05A12", "#F7E7D9", "#E8A267", "#3A2A1C"),
+ "as": ("#24658A", "#DCEAF1", "#73B6D8", "#1E3540"),
  "eu": ("#6B48B0", "#ECE5F8", "#B79BF0", "#2B2340"),
 }
 MAPS = {"me-map": ("me_map", "中東・湾岸の白地図（①〜⑪とA〜Fの番号つき）"), "eu-map": ("eu_map", "ヨーロッパの地図（国名と①〜⑳の番号つき）")}
