@@ -1,0 +1,423 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#5546A8">
+<meta name="apple-mobile-web-app-title" content="問題集">
+<meta name="format-detection" content="telephone=no">
+<title>__TITLE__</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Zen+Maru+Gothic:wght@500;700;900&display=swap">
+<style>
+/* Layout: one narrow sheet — settings, then a question card whose sentence, subtitles and input box sit high so the phone keyboard never hides them */
+:root {
+  --bg: #F0F0F6; --surface: #FFFFFF; --ink: #1D1F2E; --muted: #5E6175; --line: #D8D9E6;
+  --acc: #5546A8; --acc-soft: #E5E1F6; --ochre: #A86A12;
+  --ok: #D8432F; --ng: #2D5BD0; --on-accent: #FFFFFF;
+  --who-met: #B4447A; --who-zun: #3E8E3A; --who-en: #1F6FA8;
+  --font-display: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", "BIZ UDPGothic", sans-serif;
+  --font-body: "BIZ UDPGothic", "Hiragino Sans", "Noto Sans JP", "Yu Gothic", sans-serif;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #13141D; --surface: #1C1D29; --ink: #E6E6F0; --muted: #A2A4B8; --line: #30324A;
+    --acc: #A99BF0; --acc-soft: #2B2747; --ochre: #E5AE55; --ok: #FF6F5E; --ng: #7EA0FF; --on-accent: #15122A;
+    --who-met: #F08DBA; --who-zun: #8FD08A; --who-en: #7EC3F0; color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #13141D; --surface: #1C1D29; --ink: #E6E6F0; --muted: #A2A4B8; --line: #30324A;
+  --acc: #A99BF0; --acc-soft: #2B2747; --ochre: #E5AE55; --ok: #FF6F5E; --ng: #7EA0FF; --on-accent: #15122A;
+  --who-met: #F08DBA; --who-zun: #8FD08A; --who-en: #7EC3F0; color-scheme: dark;
+}
+* { box-sizing: border-box; }
+[hidden] { display: none !important; }
+html { -webkit-text-size-adjust: 100%; }
+body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.65;
+  padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.wrap { max-width: 34rem; margin: 0 auto; padding-inline: 14px; padding-block: .9rem 2.5rem; display: grid; gap: .9rem; }
+.top { display: flex; justify-content: space-between; align-items: center; gap: .5rem; }
+.top a { font-size: .82rem; color: var(--acc); text-decoration: none; font-weight: 700; white-space: nowrap; }
+h1 { font-family: var(--font-display); font-weight: 900; font-size: 1.4rem; line-height: 1.3; margin: 0; text-wrap: balance; }
+h1 small { display: block; font-size: .78rem; font-weight: 700; color: var(--muted); }
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 1rem; display: grid; gap: .8rem; min-width: 0; }
+.lbl { font-size: .78rem; font-weight: 700; color: var(--muted); letter-spacing: .04em; }
+.seg { display: grid; grid-template-columns: 1fr 1fr; gap: .45rem; }
+.seg button { font: inherit; text-align: left; cursor: pointer; border-radius: 12px; border: 2px solid var(--line); background: var(--surface); color: var(--ink); padding: .6rem .7rem; display: grid; gap: .05rem; min-width: 0; }
+.seg button b { font-family: var(--font-display); font-size: 1.02rem; }
+.seg button span { font-size: .74rem; color: var(--muted); overflow-wrap: anywhere; }
+.seg button[aria-pressed="true"] { border-color: var(--acc); background: var(--acc-soft); }
+.opt { display: flex; justify-content: space-between; align-items: center; gap: .6rem; font-size: .92rem; }
+.switch { display: inline-flex; align-items: center; cursor: pointer; flex: 0 0 auto; }
+.switch input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+.switch span { width: 2.6rem; height: 1.45rem; border-radius: 999px; background: var(--line); position: relative; transition: background .15s; }
+.switch span::after { content: ""; position: absolute; top: .2rem; left: .2rem; width: 1.05rem; height: 1.05rem; border-radius: 50%; background: #fff; transition: transform .15s; }
+.switch input:checked + span { background: var(--acc); }
+.switch input:checked + span::after { transform: translateX(1.15rem); }
+button.b { font: inherit; font-weight: 700; font-size: .95rem; padding: .7rem .6rem; border-radius: 12px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+button.main { background: var(--acc); color: var(--on-accent); border: 0; font-family: var(--font-display); font-size: 1.12rem; padding: .85rem; width: 100%; }
+button:disabled { opacity: .5; cursor: default; }
+button:focus-visible, textarea:focus-visible { outline: 3px solid var(--acc); outline-offset: 2px; }
+.switch input:focus-visible + span { outline: 3px solid var(--acc); outline-offset: 2px; }
+.note { font-size: .8rem; color: var(--muted); margin: 0; }
+.row { display: flex; gap: .5rem; } .row > * { flex: 1 1 0; min-width: 0; }
+
+/* player */
+.phead { display: flex; justify-content: space-between; align-items: center; gap: .5rem; }
+.count { font-family: var(--font-display); font-weight: 900; font-variant-numeric: tabular-nums; }
+.count small { font-weight: 500; color: var(--muted); }
+.chip { font: inherit; font-size: .75rem; font-weight: 700; padding: .15rem .6rem; border-radius: 999px; border: 1px solid var(--line); background: var(--surface); color: var(--ink); cursor: pointer; }
+.chip.on { background: var(--acc-soft); border-color: var(--acc); color: var(--acc); }
+.bar { height: 4px; background: var(--line); border-radius: 2px; overflow: hidden; }
+.bar span { display: block; height: 100%; width: 0; background: var(--acc); }
+.stage { display: grid; gap: .2rem; text-align: left; }
+.meta { font-size: .74rem; color: var(--muted); font-weight: 700; }
+.q { font-family: var(--font-display); font-weight: 700; font-size: 1.15rem; line-height: 1.45; overflow-wrap: anywhere; }
+.q[lang="en"] { font-family: var(--font-body); font-weight: 700; }
+.hint { font-size: .78rem; color: var(--ochre); font-weight: 700; }
+.subs { background: var(--bg); border-radius: 12px; padding: .45rem .7rem; display: grid; gap: .1rem; min-height: 2.6rem; align-content: end; }
+.sub { margin: 0; font-size: .86rem; line-height: 1.45; overflow-wrap: anywhere; }
+.sub:empty { display: none; }
+.sub.prev { font-size: .78rem; color: var(--muted); }
+.sub .who { font-weight: 700; font-size: .7rem; margin-right: .4rem; padding: .05rem .4rem; border-radius: 6px; border: 1px solid currentColor; white-space: nowrap; }
+.who.met { color: var(--who-met); } .who.zun { color: var(--who-zun); } .who.en { color: var(--who-en); }
+.sub.prev .who { opacity: .7; }
+.ansform { display: grid; gap: .45rem; }
+.ansform textarea { width: 100%; font: inherit; font-size: 1.02rem; line-height: 1.45; padding: .5rem .7rem; border-radius: 12px; border: 2px solid var(--line); background: var(--surface); color: var(--ink); resize: none; height: 2.9rem; max-height: 6.4rem; overflow-y: auto; display: block; }
+.ansform textarea:focus { border-color: var(--acc); outline: none; }
+.ansform .row button.main { flex: 1.4 1 0; font-size: 1.05rem; padding: .65rem .5rem; }
+.ansform .row button.b:not(.main) { padding: .6rem .3rem; font-size: .9rem; }
+.pchips { display: flex; gap: .4rem; }
+body.playing .top, body.playing footer { display: none; }
+.mark { display: grid; gap: .1rem; grid-template-columns: auto 1fr; align-items: center; column-gap: .7rem; }
+.mark:empty { display: none; }
+.big { font-family: var(--font-display); font-weight: 900; font-size: 2.6rem; line-height: 1; grid-row: span 2; animation: pop .35s cubic-bezier(.2,1.6,.4,1); }
+.big.ok { color: var(--ok); } .big.ng { color: var(--ng); }
+.mark .right { font-weight: 700; overflow-wrap: anywhere; line-height: 1.45; }
+.mark .you { font-size: .82rem; color: var(--muted); overflow-wrap: anywhere; }
+@keyframes pop { from { transform: scale(.3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .big { animation: none; } }
+
+/* results */
+.score { text-align: center; background: var(--bg); border-radius: 12px; padding: .6rem; }
+.score b { font-family: var(--font-display); font-size: 2rem; font-variant-numeric: tabular-nums; }
+table { width: 100%; border-collapse: collapse; font-size: .88rem; table-layout: fixed; }
+th, td { text-align: left; padding: .4rem .25rem; border-top: 1px solid var(--line); vertical-align: top; overflow-wrap: anywhere; }
+th { font-size: .72rem; color: var(--muted); }
+col.n { width: 2.3rem; } col.mk { width: 1.9rem; }
+td.n { color: var(--muted); font-variant-numeric: tabular-nums; font-size: .8rem; }
+td.mk button { font: inherit; font-weight: 900; border: 0; background: none; cursor: pointer; font-size: 1.05rem; padding: 0; }
+td.mk .o { color: var(--ok); } td.mk .x { color: var(--ng); }
+td .ans { display: block; color: var(--ochre); font-weight: 700; margin-top: .15rem; }
+td small { display: block; color: var(--muted); font-size: .74rem; }
+footer { font-size: .72rem; color: var(--muted); display: grid; gap: .15rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><h1 id="ttl"></h1><a href="./" id="toMenu">問題集へ</a></div>
+
+  <section class="card" id="setCard">
+    <div class="lbl">出題の向き</div>
+    <div class="seg" role="group" aria-label="出題の向き">
+      <button type="button" id="d-ja2en" aria-pressed="true"><b>和文 → 英作</b><span>日本語を見て、英語で入力</span></button>
+      <button type="button" id="d-en2ja" aria-pressed="false"><b>英文 → 和訳</b><span>英語を見て、日本語で入力</span></button>
+    </div>
+    <label class="opt" for="sound">音を出す（オフにすると字幕だけ）<span class="switch"><input type="checkbox" id="sound" checked><span></span></span></label>
+    <label class="opt" for="intro">はじめに説明を聞く<span class="switch"><input type="checkbox" id="intro" checked><span></span></span></label>
+    <button type="button" class="b main" id="startBtn" disabled>音声を準備しています…</button>
+    <p class="note" id="modeNote"></p>
+  </section>
+
+  <section class="card" id="playCard" hidden>
+    <div class="phead"><span class="count" id="count">説明</span><span class="pchips"><button type="button" class="chip on" id="soundChip" aria-pressed="true">音：あり</button><button type="button" class="chip" id="stopBtn">やめる</button></span></div>
+    <div class="bar" aria-hidden="true"><span id="bar"></span></div>
+    <div class="stage">
+      <div class="meta" id="meta"></div>
+      <div class="q" id="q"></div>
+      <div class="hint" id="hint" hidden></div>
+    </div>
+    <div class="mark" id="mark"></div>
+    <div class="subs" aria-live="polite" aria-label="字幕"><p class="sub prev" id="subPrev"></p><p class="sub" id="subCur"></p></div>
+    <form class="ansform" id="ansForm" autocomplete="off">
+      <textarea id="ans" rows="1" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false" enterkeyhint="done" aria-label="答え"></textarea>
+      <div class="row">
+        <button type="submit" class="b main">答える</button>
+        <button type="button" class="b" id="passBtn">わからない</button>
+        <button type="button" class="b" id="nextBtn">次へ</button>
+      </div>
+    </form>
+  </section>
+
+  <section class="card" id="resCard" hidden>
+    <div class="score">せいかい<br><b id="rs">0</b> / <span id="rn">20</span></div>
+    <p class="note">入力ミスなどで ✕ になったときは、○✕ をタップすると直せます。左の数字はプリントの番号です。</p>
+    <table><colgroup><col class="n"><col class="mk"><col></colgroup>
+      <thead><tr><th>No.</th><th></th><th id="rh">問題 → 答え</th></tr></thead><tbody id="rt"></tbody></table>
+    <button type="button" class="b main" id="retryBtn">まちがえた問題だけもう一度</button>
+    <div class="row"><button type="button" class="b" id="newBtn">新しい順番でもう一度</button><button type="button" class="b" id="setBtn">設定にもどる</button></div>
+  </section>
+
+  <footer>
+    <div id="range"></div>
+    <div>声：VOICEVOX:四国めたん（問題）／VOICEVOX:ずんだもん（答え）</div>
+    <div>英文の読み上げは、スマホに入っている英語の音声を使います。</div>
+  </footer>
+</div>
+
+<script type="application/json" id="ddata">__DATA__</script>
+<script>
+__TEXTJUDGE__
+(function () {
+"use strict";
+var DATA = JSON.parse(document.getElementById("ddata").textContent);
+var items = DATA.items, N = items.length, SUBS = DATA.subs, PFX = DATA.id + ".";
+var $ = function (id) { return document.getElementById(id); };
+var FAST = !!window.__QUIZ_FAST;
+$("ttl").innerHTML = ""; $("ttl").appendChild(document.createTextNode(DATA.title));
+var sm = document.createElement("small"); sm.textContent = DATA.subtitle; $("ttl").appendChild(sm);
+var lessons = items.map(function (it) { return it.lesson; });
+$("range").textContent = "出題範囲：" + DATA.title + "（" + lessons[0] + "〜" + lessons[N - 1] + "・" + N + "文）";
+
+/* ---------- 設定 ---------- */
+var dir = "ja2en", soundOn = true;
+function store(k, v) { try { localStorage.setItem(PFX + k, v); } catch (e) {} }
+function load(k) { try { return localStorage.getItem(PFX + k); } catch (e) { return null; } }
+if (load("dir") === "en2ja") dir = "en2ja";
+if (load("sound") === "0") soundOn = false;
+var h = (location.hash || "").replace("#", "");
+if (h === "ja2en" || h === "en2ja") dir = h;
+function paint() {
+  $("d-ja2en").setAttribute("aria-pressed", String(dir === "ja2en")); $("d-en2ja").setAttribute("aria-pressed", String(dir === "en2ja"));
+  $("sound").checked = soundOn;
+  $("modeNote").textContent = dir === "ja2en"
+    ? "答えは文字で入力します。大文字・小文字と、ピリオドや ? のちがいは採点しません（テストでは正しく書きましょう）。スタートするたびに順番が入れかわります。"
+    : "答えは文字で入力します。ひらがなでも漢字でもOK。句読点（、。）は採点しません。スタートするたびに順番が入れかわります。";
+}
+$("d-ja2en").onclick = function () { dir = "ja2en"; store("dir", dir); paint(); };
+$("d-en2ja").onclick = function () { dir = "en2ja"; store("dir", dir); paint(); };
+$("sound").onchange = function () { setSound(this.checked); };
+paint();
+
+/* ---------- 音声の部品 ---------- */
+var SR = 24000, OAC = window.OfflineAudioContext || window.webkitOfflineAudioContext, octx;
+try { octx = new OAC(1, SR, SR); } catch (e) { SR = 44100; octx = new OAC(1, SR, SR); }
+var AC = window.AudioContext || window.webkitAudioContext, ctx = new AC(), master = ctx.createGain(), sfxG = ctx.createGain();
+master.connect(ctx.destination); sfxG.connect(master); sfxG.gain.value = .45;
+var bufs = {};
+function b64(s) { var bin = atob(s), u = new Uint8Array(bin.length); for (var i = 0; i < bin.length; i++) u[i] = bin.charCodeAt(i); return u.buffer; }
+function decode(buf) { return new Promise(function (res, rej) { var done = false, ok = function (b) { if (!done) { done = true; res(b); } }, ng = function (e) { if (!done) { done = true; rej(e); } }; try { var p = octx.decodeAudioData(buf, ok, ng); if (p && p.then) p.then(ok, ng); } catch (e) { ng(e); } }); }
+var keys = Object.keys(DATA.clips), loaded = 0;
+Promise.all(keys.map(function (k) {
+  return decode(b64(DATA.clips[k])).then(function (b) { bufs[k] = b; loaded++; $("startBtn").textContent = "音声を準備しています… " + Math.round(loaded / keys.length * 100) + "%"; });
+})).then(function () { $("startBtn").disabled = false; $("startBtn").textContent = "スタート（新しい順番で）"; },
+         function () { $("startBtn").textContent = "音声を読み込めませんでした（開き直してください）"; });
+
+/* 英文はスマホの英語の音声で読む（なければ字幕だけ） */
+var synth = window.speechSynthesis, enVoice = null;
+function pickVoice() {
+  if (!synth || !synth.getVoices) return;
+  var vs = synth.getVoices() || [], pick = function (re) { for (var i = 0; i < vs.length; i++) if (re.test(vs[i].lang)) return vs[i]; return null; };
+  enVoice = pick(/^en[-_]US/i) || pick(/^en[-_]GB/i) || pick(/^en/i);
+}
+if (synth) { pickVoice(); try { synth.addEventListener("voiceschanged", pickVoice); } catch (e) {} }
+
+/* ---------- 字幕 ---------- */
+function whoClass(w) { return w === "めたん" ? "met" : w === "ずんだもん" ? "zun" : "en"; }
+function setSub(who, text) {
+  var prev = $("subPrev"), cur = $("subCur");
+  prev.innerHTML = cur.innerHTML; cur.innerHTML = "";
+  if (!text) return;
+  var w = document.createElement("span"); w.className = "who " + whoClass(who); w.textContent = who;
+  cur.appendChild(w); cur.appendChild(document.createTextNode(text));
+}
+function clearSubs() { $("subPrev").innerHTML = ""; $("subCur").innerHTML = ""; }
+
+function setSound(on) {
+  soundOn = on; store("sound", on ? "1" : "0"); $("sound").checked = on;
+  master.gain.value = on ? 1 : 0;
+  if (!on && synth) { try { synth.cancel(); } catch (e) {} }
+  var c = $("soundChip"); c.textContent = on ? "音：あり" : "音：なし（字幕のみ）"; c.className = "chip" + (on ? " on" : ""); c.setAttribute("aria-pressed", String(on));
+}
+$("soundChip").onclick = function () { setSound(!soundOn); };
+setSound(soundOn);
+
+/* ---------- 効果音 ---------- */
+function tone(f, t, dur, type, vol) { var o = ctx.createOscillator(), g = ctx.createGain(); o.type = type; o.frequency.value = f; g.gain.setValueAtTime(.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + .012); g.gain.exponentialRampToValueAtTime(.0001, t + dur); o.connect(g); g.connect(sfxG); o.start(t); o.stop(t + dur + .03); }
+var SFX = {
+  ok: function () { var t = ctx.currentTime; tone(1318.5, t, .32, "sine", .7); tone(1046.5, t + .2, .7, "sine", .7); },
+  ng: function () { var t = ctx.currentTime; tone(147, t, .2, "sawtooth", .3); tone(147, t + .27, .45, "sawtooth", .3); },
+  start: function () { var t = ctx.currentTime; [523, 659, 784, 1047].forEach(function (f, i) { tone(f, t + i * .09, .3, "triangle", .5); }); },
+  fanfare: function () { var t = ctx.currentTime; [[523,0],[523,.15],[523,.3],[659,.45],[784,.75],[1047,1.05]].forEach(function (n) { tone(n[0], t + n[1], n[0] === 1047 ? 1.1 : .22, "triangle", .5); }); }
+};
+
+/* ---------- 再生 ---------- */
+var st = { token: 0, res: {}, list: [], accepting: false, runDir: "ja2en" };
+var wake = null, curSrc = null, curRes = null, curTTS = null, skipFb = false;
+function show(id) { ["setCard", "playCard", "resCard"].forEach(function (c) { $(c).hidden = c !== id; }); document.body.classList.toggle("playing", id === "playCard"); }
+function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function requestWake() { if (navigator.wakeLock && navigator.wakeLock.request) navigator.wakeLock.request("screen").then(function (w) { wake = w; }, function () {}); }
+function releaseWake() { if (wake && wake.release) { wake.release().catch(function () {}); wake = null; } }
+function play(k) { var sb = SUBS[k]; if (sb) setSub(sb.who, sb.text); return playRaw(k); }
+function playRaw(k) {
+  return new Promise(function (res) {
+    if (skipFb) { res(); return; }
+    if (FAST || !bufs[k]) { setTimeout(res, FAST ? 1 : 0); return; }
+    var s = ctx.createBufferSource(); s.buffer = bufs[k]; s.connect(master); curSrc = s; curRes = res;
+    s.onended = function () { if (curSrc === s) { curSrc = null; curRes = null; } res(); }; s.start();
+  });
+}
+function speakEn(text) {
+  setSub("英語", text);
+  return new Promise(function (res) {
+    if (skipFb || FAST || !soundOn || !synth || !window.SpeechSynthesisUtterance) { setTimeout(res, FAST ? 1 : 0); return; }
+    var done = false, tm = 0, fin = function () { if (done) return; done = true; clearTimeout(tm); if (curTTS === fin) curTTS = null; res(); };
+    var u = new SpeechSynthesisUtterance(text.replace(/\s+[-\/]\s+/g, " "));
+    u.lang = "en-US"; if (enVoice) u.voice = enVoice; u.rate = .9; u.onend = fin; u.onerror = fin;
+    tm = setTimeout(fin, 3000 + text.length * 120); curTTS = fin;
+    try { synth.cancel(); synth.speak(u); } catch (e) { fin(); }
+  });
+}
+function stopVoice() {
+  if (curSrc) { var r = curRes; try { curSrc.onended = null; curSrc.stop(); } catch (e) {} curSrc = null; curRes = null; if (r) r(); }
+  if (curTTS) { try { synth.cancel(); } catch (e) {} curTTS(); }
+}
+function stopAll() { st.token++; st.accepting = false; answerResolve = null; nextResolve = null; stopVoice(); releaseWake(); }
+function wait(ms) { return new Promise(function (r) { setTimeout(r, FAST ? 1 : ms); }); }
+
+/* 問題・答えの文と声 */
+function qText(d, it) { return d === "ja2en" ? it.ja : it.en; }
+function aText(d, it) { return d === "ja2en" ? it.en : it.ja; }
+function sayQ(d, it) { return d === "ja2en" ? play("jq" + it.no) : speakEn(it.en); }
+function sayA(d, it) { if (d === "ja2en") return speakEn(it.en); setSub("ずんだもん", it.ja); return playRaw("ja" + it.no); }
+function judge(d, it, text) { return d === "ja2en" ? textJudgeSentence("en", [it.enAns], text) : textJudgeSentence("ja", [it.jaAns], text); }
+
+/* ---------- 入力 ---------- */
+var answerResolve = null, nextResolve = null;
+function submitAns() {
+  if (!st.accepting || !answerResolve) return;
+  var v = $("ans").value; if (!v.trim()) return;
+  var r = answerResolve; answerResolve = null; st.accepting = false; r({ text: v });
+}
+$("ansForm").addEventListener("submit", function (e) { e.preventDefault(); submitAns(); });
+function fitAns() { var a = $("ans"); a.style.height = "auto"; a.style.height = Math.min(a.scrollHeight + 4, 102) + "px"; }
+$("ans").addEventListener("input", fitAns);
+$("ans").addEventListener("keydown", function (e) {
+  if (e.key === "Enter" && !e.shiftKey && !e.isComposing && e.keyCode !== 229) { e.preventDefault(); submitAns(); }
+});
+function goNext() { if (nextResolve) { var n = nextResolve; nextResolve = null; skipFb = true; stopVoice(); n(); } }
+$("passBtn").onclick = function () {
+  if (st.accepting && answerResolve) { var r = answerResolve; answerResolve = null; st.accepting = false; r({ pass: true }); }
+  else goNext();
+};
+$("nextBtn").onclick = goNext;
+function waitAnswer() { return new Promise(function (r) { answerResolve = r; st.accepting = true; }); }
+function waitNext(ms) { return new Promise(function (r) { nextResolve = r; setTimeout(function () { if (nextResolve === r) { nextResolve = null; r(); } }, FAST ? 1 : ms); }); }
+
+function showMark(kind, you, right) {
+  var m = $("mark"); m.innerHTML = "";
+  if (!kind) return;
+  var s = document.createElement("div"); s.className = "big " + (kind === "correct" ? "ok" : "ng"); s.textContent = kind === "correct" ? "○" : "✕"; m.appendChild(s);
+  var r = document.createElement("div"); r.className = "right"; r.textContent = (kind === "close" ? "おしい！ 正解：" : kind === "correct" ? "" : "正解：") + right; m.appendChild(r);
+  var y = document.createElement("div"); y.className = "you"; y.textContent = "あなたの答え：" + you; m.appendChild(y);
+}
+function setPrompt(d, it) {
+  $("q").textContent = qText(d, it); $("q").setAttribute("lang", d === "ja2en" ? "ja" : "en");
+  $("meta").textContent = "プリント No." + it.no + "（" + it.lesson + "）";
+  var multi = /\//.test(it.en);
+  $("hint").hidden = !multi; $("hint").textContent = multi ? "※ はい・いいえ の答えも続けて入力" : "";
+}
+async function runText(list, d, withIntro) {
+  var my = ++st.token, alive = function () { return my === st.token; };
+  st.list = list; st.runDir = d;
+  var ans = $("ans");
+  ans.setAttribute("lang", d === "ja2en" ? "en" : "ja");
+  ans.placeholder = d === "ja2en" ? "英語で入力" : "日本語で入力（ひらがなでもOK）";
+  clearSubs(); $("mark").innerHTML = ""; $("hint").hidden = true;
+  if (withIntro) {
+    $("count").textContent = "説明"; $("meta").textContent = ""; $("q").textContent = "説明を聞いてね";
+    for (var k of ["in_" + d + "_1", "in_" + d + "_2", "in_3"]) { await play(k); if (!alive()) return; await wait(300); if (!alive()) return; }
+  }
+  for (var p = 0; p < list.length; p++) {
+    var it = items[list[p]]; skipFb = false;
+    $("count").innerHTML = "第 " + (p + 1) + " 問 <small>/ " + list.length + "</small>";
+    $("bar").style.width = (p / list.length * 100) + "%";
+    setPrompt(d, it); $("mark").innerHTML = ""; clearSubs();
+    ans.value = ""; ans.disabled = false; fitAns();
+    try { ans.focus({ preventScroll: true }); } catch (e) { ans.focus(); }
+    var ansP = waitAnswer();
+    sayQ(d, it);
+    var r = await ansP; if (!alive()) return;
+    stopVoice();
+    var j = r.pass ? { status: "pass" } : judge(d, it, r.text);
+    var ok = j.status === "correct", you = r.pass ? "わからない" : r.text;
+    st.res[it.no] = { ok: ok, you: you, close: j.status === "close" };
+    showMark(ok ? "correct" : (j.status === "close" ? "close" : "wrong"), you, aText(d, it));
+    var nextP;
+    if (ok) {
+      SFX.ok(); await wait(550); if (!alive()) return;
+      nextP = waitNext(60000);
+      await play("praise" + (1 + Math.floor(Math.random() * 3))); if (!alive()) return;
+      await sayA(d, it); if (!alive()) return;
+    } else {
+      SFX.ng(); await wait(700); if (!alive()) return;
+      nextP = waitNext(60000);
+      await play(j.status === "close" ? "close" : "ngpre"); if (!alive()) return;
+      await sayA(d, it); if (!alive()) return;
+    }
+    if (nextResolve) { var nr = nextResolve; nextResolve = null; nr(); }
+    await nextP; if (!alive()) return;
+    if (!skipFb) { await wait(ok ? 600 : 1300); if (!alive()) return; }
+  }
+  $("bar").style.width = "100%";
+  SFX.fanfare(); await play("end_tx"); if (!alive()) return;
+  showResults();
+}
+function showResults() {
+  releaseWake(); show("resCard");
+  var d = st.runDir, tb = $("rt"); tb.innerHTML = "";
+  $("rh").textContent = d === "ja2en" ? "日本語 → 英語（答え）" : "英語 → 日本語（答え）";
+  var score = 0;
+  st.list.forEach(function (idx) {
+    var it = items[idx], r = st.res[it.no], tr = document.createElement("tr");
+    tr.innerHTML = "<td class='n'></td><td class='mk'></td><td></td>";
+    tr.children[0].textContent = it.no;
+    var b = document.createElement("button"); b.type = "button"; b.className = r && r.ok ? "o" : "x"; b.textContent = r && r.ok ? "○" : "✕";
+    b.setAttribute("aria-label", (r && r.ok ? "正解" : "不正解") + "（タップで切りかえ）");
+    b.onclick = function () { if (r) { r.ok = !r.ok; showResults(); } };
+    tr.children[1].appendChild(b);
+    var c = tr.children[2];
+    c.appendChild(document.createTextNode(qText(d, it)));
+    var a = document.createElement("span"); a.className = "ans"; a.setAttribute("lang", d === "ja2en" ? "en" : "ja"); a.textContent = aText(d, it); c.appendChild(a);
+    if (r && !r.ok) { var s = document.createElement("small"); s.textContent = "あなた：" + r.you; c.appendChild(s); }
+    if (r && r.ok) score++;
+    tb.appendChild(tr);
+  });
+  $("rs").textContent = score; $("rn").textContent = st.list.length;
+  var wrong = st.list.filter(function (idx) { var r = st.res[items[idx].no]; return !(r && r.ok); });
+  $("retryBtn").disabled = !wrong.length;
+  $("retryBtn").textContent = wrong.length ? "まちがえた問題だけもう一度（" + wrong.length + "問）" : "まちがいなし！";
+}
+$("retryBtn").onclick = function () {
+  var wrong = st.list.filter(function (idx) { var r = st.res[items[idx].no]; return !(r && r.ok); });
+  if (!wrong.length) return; show("playCard"); requestWake(); runText(shuffle(wrong.slice()), st.runDir, false);
+};
+$("newBtn").onclick = function () { begin(); };
+$("setBtn").onclick = function () { stopAll(); show("setCard"); };
+
+/* ---------- 開始・終了 ---------- */
+async function begin() {
+  stopAll(); await ctx.resume(); pickVoice();
+  show("playCard"); SFX.start();
+  st.res = {}; requestWake(); runText(shuffle(items.map(function (_, i) { return i; })), dir, $("intro").checked);
+}
+$("startBtn").onclick = begin;
+$("stopBtn").onclick = function () { stopAll(); show("setCard"); };
+window.__reibunState = function () { return { res: st.res, list: st.list.map(function (i) { return items[i].no; }), dir: st.runDir, sub: $("subCur").textContent, prev: $("subPrev").textContent }; };
+})();
+</script>
+</body>
+</html>

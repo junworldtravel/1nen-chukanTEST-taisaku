@@ -1,0 +1,38 @@
+{
+  "id": "kihon-reibun-03",
+  "title": "基本例文集③",
+  "subtitle": "中学1年生2学期中間テスト対策",
+  "source": "基本例文集③ プリント（写真より転記）",
+  "answerMethod": "text",
+  "judge": "textjudge",
+  "voice": { "enabled": true, "pair": "shikoku-metan_zundamon" },
+  "modes": [
+    { "key": "ja2en", "label": "和文→英作", "promptField": "ja", "answerField": "en",
+      "instruction": "日本語の文を見て、英語で入力してください。" },
+    { "key": "en2ja", "label": "英文→和訳", "promptField": "en", "answerField": "ja",
+      "instruction": "英語の文を見て、日本語で入力してください。" }
+  ],
+  "items": [
+    { "no": 1, "lesson": "L4-1", "en": "He goes to the library after school.", "ja": "彼は放課後図書館に行きます。" },
+    { "no": 2, "lesson": "L4-1", "en": "She learns fifty English words every week.", "ja": "彼女は毎週50個の英単語を学んでいます。" },
+    { "no": 3, "lesson": "L4-2", "en": "Mr. Smith has two cats.", "ja": "スミスさんは二匹の猫を飼っています。" },
+    { "no": 4, "lesson": "L4-2", "en": "My brother doesn't listen to music.", "ja": "私の兄は音楽を聴きません。" },
+    { "no": 5, "lesson": "L4-2", "en": "Does your mother cook Chinese food? - Yes, she does. / No, she doesn't.", "ja": "あなたの母は中華料理を作りますか。—— はい、作ります。／いいえ、作りません。" },
+    { "no": 6, "lesson": "L4-2", "en": "I always drink milk for breakfast.", "ja": "私はいつも朝食に牛乳を飲みます。" },
+    { "no": 7, "lesson": "L4-2", "en": "Janet never eats natto.", "ja": "ジャネットは決して納豆を食べない。" },
+    { "no": 8, "lesson": "L4-2", "en": "My mother is always busy in the morning.", "ja": "私の母はいつも朝は忙しい。" },
+    { "no": 9, "lesson": "L4-3", "en": "Where do you live?", "ja": "あなたはどこに住んでいますか。" },
+    { "no": 10, "lesson": "L4-3", "en": "Where are your classmates?", "ja": "あなたのクラスメイトはどこですか。" },
+    { "no": 11, "lesson": "L4-3", "en": "What time does your school start?", "ja": "あなたの学校は何時に始まりますか。" },
+    { "no": 12, "lesson": "L4-3", "en": "When is your school festival?", "ja": "あなたの学校の文化祭はいつですか。" },
+    { "no": 13, "lesson": "L5-1", "en": "This pencil case is mine.", "ja": "この筆箱は私のものです。" },
+    { "no": 14, "lesson": "L5-1", "en": "Whose umbrella is this?", "ja": "これは誰の傘ですか。" },
+    { "no": 15, "lesson": "L5-1", "en": "Is that ruler yours?", "ja": "あの定規はあなたのものですか。" },
+    { "no": 16, "lesson": "L5-2", "en": "How old is your brother?", "ja": "あなたの兄は何歳ですか。" },
+    { "no": 17, "lesson": "L5-2", "en": "How long is the Tone River?", "ja": "利根川はどれくらい長いですか。" },
+    { "no": 18, "lesson": "L5-3", "en": "Who plays baseball well?", "ja": "誰が野球を上手にしますか。" },
+    { "no": 19, "lesson": "L5-3", "en": "Which is your cup, this one or that one?", "ja": "あなたのコップはどっちですか、これですか、あれですか。" },
+    { "no": 20, "lesson": "L5-3", "en": "What subject do you like?", "ja": "あなたは何の教科が好きですか。" }
+  ]
+}
+
