@@ -3,138 +3,85 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#24658A">
+<meta name="theme-color" content="#0E8A72">
 <meta name="apple-mobile-web-app-title" content="問題集">
 <meta name="format-detection" content="telephone=no">
-<title>地理 問題集</title>
+<title>テスト対策 問題集</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=BIZ+UDPGothic:wght@400;700&family=Zen+Maru+Gothic:wght@700;900&display=swap">
 <style>
-/* Layout: portal — one block per region (Asia / Middle East / Europe), each holding its problem sets as cards with large tap targets */
+/* Layout: two problem-set cards stacked; each offers its answer styles as large tap targets */
 :root {
-  --bg: #EAF1F6; --surface: #FFFFFF; --ink: #172231; --muted: #5B6878; --line: #D3DDE6; --on: #FFFFFF;
-  --asia: #24658A; --asia-soft: #DCEAF1; --asia2: #0E8A72; --asia2-soft: #D7F0E9;
-  --me: #B05A12; --me-soft: #F7E7D9; --eu: #6B48B0; --eu-soft: #ECE5F8;
+  --bg: #EAF1F6; --surface: #FFFFFF; --ink: #172231; --muted: #5B6878; --line: #D3DDE6;
+  --drill: #24658A; --drill-soft: #DCEAF1; --map: #0E8A72; --map-soft: #D7F0E9; --eng: #5546A8; --eng-soft: #E5E1F6; --on: #FFFFFF;
   --font-display: "Zen Maru Gothic", "Hiragino Maru Gothic ProN", sans-serif;
   --font-body: "BIZ UDPGothic", "Hiragino Sans", "Noto Sans JP", sans-serif;
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme="light"]) { --bg: #0F171D; --surface: #18232B; --ink: #E4ECF2; --muted: #9AABB8; --line: #2C3A45; --on: #10161B;
-    --asia: #73B6D8; --asia-soft: #1E3540; --asia2: #3FC2A3; --asia2-soft: #163A33; --me: #E8A267; --me-soft: #3A2A1C; --eu: #B79BF0; --eu-soft: #2B2340; color-scheme: dark; }
+  :root:not([data-theme="light"]) { --bg: #0F171D; --surface: #18232B; --ink: #E4ECF2; --muted: #9AABB8; --line: #2C3A45;
+    --drill: #73B6D8; --drill-soft: #1E3540; --map: #3FC2A3; --map-soft: #163A33; --eng: #A99BF0; --eng-soft: #2B2747; --on: #0B1A16; color-scheme: dark; }
 }
-:root[data-theme="dark"] { --bg: #0F171D; --surface: #18232B; --ink: #E4ECF2; --muted: #9AABB8; --line: #2C3A45; --on: #10161B;
-  --asia: #73B6D8; --asia-soft: #1E3540; --asia2: #3FC2A3; --asia2-soft: #163A33; --me: #E8A267; --me-soft: #3A2A1C; --eu: #B79BF0; --eu-soft: #2B2340; color-scheme: dark; }
+:root[data-theme="dark"] { --bg: #0F171D; --surface: #18232B; --ink: #E4ECF2; --muted: #9AABB8; --line: #2C3A45;
+  --drill: #73B6D8; --drill-soft: #1E3540; --map: #3FC2A3; --map-soft: #163A33; --eng: #A99BF0; --eng-soft: #2B2747; --on: #0B1A16; color-scheme: dark; }
 * { box-sizing: border-box; }
 body { margin: 0; background: var(--bg); color: var(--ink); font-family: var(--font-body); line-height: 1.65;
   padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
-.wrap { max-width: 34rem; margin: 0 auto; padding-inline: 16px; padding-block: 1.4rem 2.5rem; display: grid; gap: 1.1rem; }
+.wrap { max-width: 34rem; margin: 0 auto; padding-inline: 16px; padding-block: 1.4rem 2.5rem; display: grid; gap: 1rem; }
 h1 { font-family: var(--font-display); font-weight: 900; font-size: 1.6rem; margin: 0; line-height: 1.3; }
 .lead { margin: 0; color: var(--muted); font-size: .9rem; }
-nav.jump { display: flex; gap: .4rem; flex-wrap: wrap; }
-nav.jump a { font-size: .82rem; font-weight: 700; text-decoration: none; padding: .25rem .75rem; border-radius: 999px; border: 1px solid var(--c); color: var(--c); background: var(--surface); }
-.region { display: grid; gap: .6rem; scroll-margin-top: 1rem; }
-.region > h2 { margin: .3rem 0 0; font-family: var(--font-display); font-weight: 900; font-size: 1.25rem; display: flex; align-items: center; gap: .5rem; }
-.region > h2::before { content: ""; width: .55rem; height: 1.25rem; border-radius: 4px; background: var(--c); }
-.set { background: var(--surface); border: 1px solid var(--line); border-top: 4px solid var(--c); border-radius: 16px; padding: .9rem 1rem 1rem; display: grid; gap: .6rem; }
-.set h3 { margin: 0; font-family: var(--font-display); font-size: 1.08rem; line-height: 1.4; }
-.set h3 .no { color: var(--c); margin-right: .35rem; font-variant-numeric: tabular-nums; }
-.set p { margin: 0; font-size: .85rem; color: var(--muted); }
+.set { background: var(--surface); border: 1px solid var(--line); border-radius: 16px; padding: 1rem; display: grid; gap: .7rem; }
+.set h2 { margin: 0; font-family: var(--font-display); font-size: 1.2rem; display: flex; gap: .5rem; align-items: baseline; }
+.set h2 .no { font-size: 1.4rem; }
+.set p { margin: 0; font-size: .88rem; color: var(--muted); }
 .btns { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
-.btns a { display: grid; gap: .1rem; text-decoration: none; border-radius: 12px; padding: .7rem .8rem; font-weight: 700; min-width: 0; }
-.btns a b { font-family: var(--font-display); font-size: 1.02rem; }
+.btns a { display: grid; gap: .1rem; text-decoration: none; border-radius: 12px; padding: .75rem .8rem; font-weight: 700; min-width: 0; }
+.btns a b { font-family: var(--font-display); font-size: 1.05rem; }
 .btns a span { font-size: .74rem; font-weight: 400; opacity: .85; }
-.home { background: var(--c); color: var(--on); }
-.train { background: var(--cs); color: var(--ink); border: 1px solid var(--c); }
-.grid4 { display: grid; grid-template-columns: auto 1fr 1fr; gap: .45rem; align-items: stretch; }
-.grid4 .hd { font-size: .72rem; font-weight: 700; color: var(--muted); text-align: center; align-self: end; }
-.grid4 .rl { font-size: .8rem; font-weight: 700; display: grid; align-content: center; line-height: 1.3; padding-right: .1rem; }
-.grid4 .rl small { display: block; font-weight: 400; font-size: .68rem; color: var(--muted); }
-.grid4 a { display: grid; place-items: center; text-align: center; text-decoration: none; border-radius: 12px; padding: .65rem .4rem; font-family: var(--font-display); font-weight: 700; font-size: .95rem; min-width: 0; line-height: 1.3; }
-a:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
-.asia { --c: var(--asia); --cs: var(--asia-soft); }
-.asia .map2 { --c: var(--asia2); --cs: var(--asia2-soft); }
-.me { --c: var(--me); --cs: var(--me-soft); }
-.eu { --c: var(--eu); --cs: var(--eu-soft); }
+.drill .home { background: var(--drill); color: var(--on); } .drill .train { background: var(--drill-soft); color: var(--ink); border: 1px solid var(--drill); }
+.map .home { background: var(--map); color: var(--on); } .map .train { background: var(--map-soft); color: var(--ink); border: 1px solid var(--map); }
+.eng .home { background: var(--eng); color: var(--on); } .eng .train { background: var(--eng-soft); color: var(--ink); border: 1px solid var(--eng); }
+.set h2 .tag { font-family: var(--font-body); font-size: .72rem; font-weight: 700; color: var(--muted); }
+.btns a:focus-visible { outline: 3px solid var(--ink); outline-offset: 2px; }
 .tips { font-size: .82rem; color: var(--muted); display: grid; gap: .2rem; margin: 0; padding-left: 1.1rem; }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>地理 問題集</h1>
+  <h1>テスト対策 問題集</h1>
   <p class="lead">定期考査対策。家では声で、電車ではイヤホン＋文字入力で練習できます。</p>
-  <nav class="jump" aria-label="地域">
-    <a href="#asia" class="asia">アジア全域</a><a href="#me" class="me">中東/湾岸地域</a><a href="#eu" class="eu">欧州全域</a>
-  </nav>
 
-  <section class="region asia" id="asia">
-    <h2>アジア全域</h2>
-    <div class="set">
-      <h3>首都-国名match</h3>
-      <p>Excelの24組。国名→首都／首都→国名を、スタートのたびにばらばらの順で。</p>
-      <div class="btns">
-        <a class="home" href="drill.html#recite"><b>頭の中で答える</b><span>聞いて暗唱、自動で進む</span></a>
-        <a class="train" href="drill.html#text"><b>文字で答える</b><span>電車用・○✕で採点</span></a>
-      </div>
-    </div>
-    <div class="set map2">
-      <h3>白地図から首都＆国名回答</h3>
-      <p>地図の①〜㉔の国名と首都を、東から順に答えます。</p>
-      <div class="btns">
-        <a class="home" href="map.html#voice"><b>声で答える</b><span>家で・マイクを使う</span></a>
-        <a class="train" href="map.html#text"><b>文字で答える</b><span>電車用・入力して答える</span></a>
-      </div>
+  <section class="set drill">
+    <h2><span class="no">①</span>首都の暗記ドリル</h2>
+    <p>配布されたExcelの24組。国名→首都／首都→国名、スタートのたびに順番が変わります。</p>
+    <div class="btns">
+      <a class="home" href="drill.html#recite"><b>頭の中で答える</b><span>聞いて暗唱、自動で進む</span></a>
+      <a class="train" href="drill.html#text"><b>文字で答える</b><span>電車用・○✕で採点</span></a>
     </div>
   </section>
 
-  <section class="region me" id="me">
-    <h2>中東/湾岸地域</h2>
-    <div class="set">
-      <h3><span class="no">①-1</span>白地図から首都＆国名回答</h3>
-      <p>①〜⑪（プリントの番号）とA〜Fの国名と首都。全27問。</p>
-      <div class="grid4">
-        <span></span><span class="hd">声で答える</span><span class="hd">文字で答える</span>
-        <span class="rl">a）声で出題<small>読み上げ</small></span><a class="home" href="me-map.html#a-voice">a・声</a><a class="train" href="me-map.html#a-text">a・文字</a>
-        <span class="rl">b）文字で出題<small>画面の文</small></span><a class="home" href="me-map.html#b-voice">b・声</a><a class="train" href="me-map.html#b-text">b・文字</a>
-      </div>
-    </div>
-    <div class="set">
-      <h3><span class="no">①-2</span>民族・宗教紛争・過去の戦争・資源の輸出</h3>
-      <p>一問一答19問。順番はランダム（番号順も選べます）。</p>
-      <div class="grid4">
-        <span></span><span class="hd">声で答える</span><span class="hd">文字で答える</span>
-        <span class="rl">a）声で出題<small>読み上げ</small></span><a class="home" href="me-qa.html#a-voice">a・声</a><a class="train" href="me-qa.html#a-text">a・文字</a>
-        <span class="rl">b）文字で出題<small>画面の文</small></span><a class="home" href="me-qa.html#b-voice">b・声</a><a class="train" href="me-qa.html#b-text">b・文字</a>
-      </div>
+  <section class="set map">
+    <h2><span class="no">②</span>白地図クイズ</h2>
+    <p>地図の①〜㉔の国名と首都を、東から順に答えます。</p>
+    <div class="btns">
+      <a class="home" href="map.html#voice"><b>声で答える</b><span>家で・マイクを使う</span></a>
+      <a class="train" href="map.html#text"><b>文字で答える</b><span>電車用・入力して答える</span></a>
     </div>
   </section>
 
-  <section class="region eu" id="eu">
-    <h2>欧州全域</h2>
-    <div class="set">
-      <h3><span class="no">②-1</span>地図から地形の名称回答</h3>
-      <p>国名が入った地図で、山脈・海・海流・川・平原・半島など①〜⑳。</p>
-      <div class="grid4">
-        <span></span><span class="hd">声で答える</span><span class="hd">文字で答える</span>
-        <span class="rl">a）声で出題<small>読み上げ</small></span><a class="home" href="eu-map.html#a-voice">a・声</a><a class="train" href="eu-map.html#a-text">a・文字</a>
-        <span class="rl">b）文字で出題<small>画面の文</small></span><a class="home" href="eu-map.html#b-voice">b・声</a><a class="train" href="eu-map.html#b-text">b・文字</a>
-      </div>
-    </div>
-    <div class="set">
-      <h3><span class="no">②-2</span>気候・宗教（キリスト教の宗派・習慣）・言語</h3>
-      <p>一問一答19問。北欧〜地中海〜大西洋沿岸の気候と、宗派と言語のむすびつき。</p>
-      <div class="grid4">
-        <span></span><span class="hd">声で答える</span><span class="hd">文字で答える</span>
-        <span class="rl">a）声で出題<small>読み上げ</small></span><a class="home" href="eu-qa.html#a-voice">a・声</a><a class="train" href="eu-qa.html#a-text">a・文字</a>
-        <span class="rl">b）文字で出題<small>画面の文</small></span><a class="home" href="eu-qa.html#b-voice">b・声</a><a class="train" href="eu-qa.html#b-text">b・文字</a>
-      </div>
+  <section class="set eng">
+    <h2><span class="no">③</span>英語 基本例文集③<span class="tag">L4-1〜L5-3</span></h2>
+    <p>プリントの20文。日本語→英語／英語→日本語を、文字で入力して答えます。スタートのたびに順番が変わります。</p>
+    <div class="btns">
+      <a class="home" href="reibun3.html#ja2en"><b>和文 → 英作</b><span>日本語を見て英語で入力</span></a>
+      <a class="train" href="reibun3.html#en2ja"><b>英文 → 和訳</b><span>英語を見て日本語で入力</span></a>
     </div>
   </section>
 
   <ul class="tips">
-    <li>a）は問題を声で読み上げます。b）は画面の文を読んで、自分のペースで進めます。</li>
-    <li>読み上げるセリフは、すべて画面に字幕で出ます。音を出せないときは、各ページの「音」をオフにすると字幕だけで進められます。</li>
+    <li>読み上げるセリフは、すべて画面に字幕で出ます。</li>
+    <li>音を出せないときは、各ページの「音」をオフにすると字幕だけで進められます。</li>
     <li>AndroidはChrome、iPhoneはSafariで開いてください。iPhoneで音が出ないときは、消音スイッチと音量を確認してください。</li>
   </ul>
 </div>
